@@ -1,5 +1,3 @@
-
-
 ## numpy
 
 |      |                        |
@@ -38,8 +36,8 @@
 | 判断序列 | dataframe.**colums**=="col" |
 | 获取索引值 | dataframe.**index** |
 | 创建表格 | pd.DataFrame(index=range(0,2),colums=['aa','bb']) |
-|  |  |
-|  |  |
+| 切片 | data.iloc[:, data.columns != 'Class']<br />参数可以true false ，也可以是索引值 |
+|  | data[data.Class == 1] |
 |  |  |
 |  |  |
 |  |  |
@@ -104,18 +102,18 @@ def plot_confusion_matrix(cm, classes,
 ## sklearn
 
 |              |                                                              |
-| ------------ | :----------------------------------------------------------: |
-| 标准化       |       standardscaler( ).fit_transform(dataframe[col])        |
+| :----------- | :----------------------------------------------------------- |
+| 标准化       | standardscaler( ).fit_transform(dataframe[col])              |
 | 计算距离     | from scipy.spatial import distance<br/>distance.euclidean(list1,list2) |
 | 交叉验证     | from sklearn.model_selection import KFold<br />KFold = **KFold**(len,n_splits=5,shuffle=True)<br />for train_index,test_index in **KFold.split**(datafram):<br />返回表格索引值index,type=ndarray |
 | 随机森林分类 | from sklearn.ensemble import RandomForestClassifier<br />**RandomForestClassifier**(n_estimators=n,max_depth=m) |
-| 划分数据集   |             train_test_split(x,y,test_size=0.3)              |
+| 划分数据集   | train_test_split(x,y,test_size=0.3)                          |
 | 召回率       | from sklearn.metrics import confusion_matrix,recall_score<br />recall_socre(yfact,ypred) |
 |              |                                                              |
 |              |                                                              |
 |              |                                                              |
 
-
+# Python
 
 ## 面向对象
 
@@ -135,7 +133,7 @@ def plot_confusion_matrix(cm, classes,
 | csv读取  |        import csv<br />csv.reader(csvfile)         |
 |          |                                                    |
 
-字符串 "the number of trees : {0}"**.format**(n)
+字符串 
 
 
 
@@ -147,10 +145,74 @@ def plot_confusion_matrix(cm, classes,
 |                |                                                            |
 |                |                                                            |
 
+## 变量、数据
+
+|                      |                                                        |
+| -------------------- | ------------------------------------------------------ |
+| 删除变量             | **del** variable                                       |
+| 类型转换             | int("18")<br />str(18)<br />float("1.5")<br />str(2.6) |
+| 算术运算符           | + - * /小数商 %取余 //整数商 **                        |
+| 变量交换             | a,b =b,a                                               |
+| 二进制写法BIN        | data02 = 0b10                                          |
+| 八进制写法           | data03 = 0o10                                          |
+| 科学计数法写法       | data06 = 1e-5                                          |
+| 逻辑运算符           | and or not                                             |
+| 换行符               | \                                                      |
+| 区间内一个随机数整数 | import random<br />random.**randint**(1,100)           |
+| 变量内存地址         | id(var)                                                |
+| 索引                 | str[1]<br />str[-1]                                    |
+| 切片                 | str[1:21]<br />str[:]<br />str[::-1] # 反转            |
+|                      |                                                        |
+|                      |                                                        |
+|                      |                                                        |
+|                      |                                                        |
+
+## if while for
+
+|          |                                                |
+| -------- | ---------------------------------------------- |
+| for 遍历 | for  ...in...:<br />for ... in range(1,100,2): |
+| break    | 终止循环                                       |
+| continue | 跳过后面程序，继续循环                         |
+|          |                                                |
+
+## 字符串
+
+|                                       |                                                              |
+| ------------------------------------- | ------------------------------------------------------------ |
+| 编码值，字符串转数字                  | # 字 --> 数<br />print(**ord**("a"))# 97<br /># 数 --> 字<br />print(**chr**(97)) # a |
+| 转义字符，换行                        | \n                                                           |
+| 字符串拼接                            | “...” + str +" ...."                                         |
+| 字符串占位符                          | print("主语是:%s,谓语是:%s,宾语是:%s" % (subject, predicate, object)) |
+| 字符串format                          | "the number of trees : {0}"**.format**(n)                    |
+| + 容器拼接                            | message = "悟空" + "八戒" <br />print(message)  # 悟空八戒   |
+| * 重复生成                            | name = "悟空" * 2 <br />print(name)  # 悟空悟空              |
+| < <= > >= == != 比较元素unicode编码值 |                                                              |
+| 成员运算                              | in not in                                                    |
+| 字符串索引                            |                                                              |
+|                                       |                                                              |
+|                                       |                                                              |
+|                                       |                                                              |
+|                                       |                                                              |
+
+## list
+
+|                                            |                                          |
+| ------------------------------------------ | ---------------------------------------- |
+| 创建 语法1：列表名 = [数据1, 数据2, 数据3] | list_name = ["邱乾清", "赵屿", "廖显威"] |
+| 创建 语法2：列表名 = list(可迭代对象)      | list_data = list("邱乾清")               |
+|                                            |                                          |
+|                                            |                                          |
+|                                            |                                          |
+|                                            |                                          |
+|                                            |                                          |
+|                                            |                                          |
+|                                            |                                          |
 
 
 
-# 数据处理
+
+# database
 
 * 数据处理概述
 
@@ -2907,7 +2969,7 @@ db.close() 关闭连接
 
 * * * 
 
-综合项目及工具
+Git
 ==========================
 
 | Tedu Python 教学部 |
@@ -4371,13 +4433,13 @@ pool.join()
 
   
 
-  ![](./img/21.jpg)
+  ![](./img/n21.jpg)
 
 #### 2.3.2 多线程编程
 
 * 线程模块： threading
 
-![](./img/22.jpg)
+![](./img/n22.jpg)
 
 
 
