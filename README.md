@@ -1,3 +1,5 @@
+
+
 ## numpy
 
 |      |                        |
@@ -115,16 +117,6 @@ def plot_confusion_matrix(cm, classes,
 
 # Python
 
-## 面向对象
-
-|        |              |
-| :----: | ------------ |
-| 类对象 | @classmethod |
-|        |              |
-|        |              |
-
-
-
 ## IO
 
 |          |                                                    |
@@ -190,25 +182,1106 @@ def plot_confusion_matrix(cm, classes,
 | < <= > >= == != 比较元素unicode编码值 |                                                              |
 | 成员运算                              | in not in                                                    |
 | 字符串索引                            |                                                              |
-|                                       |                                                              |
-|                                       |                                                              |
+| 换行                                  | print()                                                      |
+| 以空格连接                            | print("ab",end=" ")                                          |
 |                                       |                                                              |
 |                                       |                                                              |
 
 ## list
 
-|                                            |                                          |
-| ------------------------------------------ | ---------------------------------------- |
-| 创建 语法1：列表名 = [数据1, 数据2, 数据3] | list_name = ["邱乾清", "赵屿", "廖显威"] |
-| 创建 语法2：列表名 = list(可迭代对象)      | list_data = list("邱乾清")               |
-|                                            |                                          |
-|                                            |                                          |
-|                                            |                                          |
-|                                            |                                          |
-|                                            |                                          |
-|                                            |                                          |
-|                                            |                                          |
+|                                            |                                                           |
+| ------------------------------------------ | --------------------------------------------------------- |
+| 创建 语法1：列表名 = [数据1, 数据2, 数据3] | list_name = ["邱乾清", "赵屿", "廖显威"]                  |
+| 创建 语法2：列表名 = list(可迭代对象)      | list_data = list("邱乾清")                                |
+| 定位                                       | list[1]                                                   |
+| 切片                                       | list[:2]                                                  |
+| 遍历                                       |                                                           |
+| 删除列表元素                               | list.remove("...")                                        |
+| 删除列表元素，索引                         | del list_name[:]                                          |
+| 浅拷贝，深拷贝:嵌套列表值不互相影响        | copy.deepcopy(list)                                       |
+| 列表转换为字符串                           | result = "连接符".join(list)<br />result = "*".join(list) |
+| 字符串转化为列表                           | "a-b-c-d".split("-")                                      |
+|                                            |                                                           |
+|                                            |                                                           |
+|                                            |                                                           |
+|                                            |                                                           |
 
+列表推导式 嵌套
+
+```python
+list01 = ["香蕉", "苹果", "哈密瓜"]
+list02 = ["牛奶", "可乐", "雪碧", "咖啡"]
+# list_result = []
+# # 取
+# for r in list01:
+#     # 比
+#     for c in list02:
+#         list_result.append(r + c)
+list_result = [r + c for r in list01 for c in list02]
+print(list_result)
+```
+
+## 元组
+
+|                                      |                                                              |
+| ------------------------------------ | ------------------------------------------------------------ |
+| 创建，元组名 = (数据1, 数据2, 数据3) | tuple_name = ("邱乾清", "刘斯博", "夏锡亮")                  |
+| 创建，元组名= tuple(列表)            | tuple_result = tuple(list_data)                              |
+| 定位                                 | tuple_name[-1]                                               |
+| 遍历                                 | for item in tuple_name:<br />for i in range(len(tuple_name) - 1, -1, -1): |
+|                                      |                                                              |
+
+```python
+# 注意1：如果元组中只有一个元素,必须加上逗号
+    tuple01 = ("数据",)
+print(type(tuple01))
+
+# 注意2：构建元组的括号可以省略
+tuple02 = "数据1", "数据2", "数据3"
+print(tuple02)
+
+# 注意3:序列拆包
+a, b, c = (10, 20, 30)
+a, b, c = [10, 20, 30]
+a, b, c = "孙悟空"
+```
+
+
+
+## 字典
+
+|                                         |                                                              |
+| --------------------------------------- | ------------------------------------------------------------ |
+| 创建<br />字典名 = {键1: 值1, 键2: 值2} | dict_lsw = {"name": "李世伟", "age": 26, "sex": "男"}        |
+| 创建<br />字典名 = dict(可迭代对象)     | list01 = ["唐僧", ("猪", "八戒"), ["悟", "空"]]<br />dict01 = dict(list01) |
+| 添加(键不存在)<br />字典名[键] = 值     | if "money" not in dict_lsw:<br />         dict_lsw["money"] = 10000000 |
+| 读取<br />字典名[建]                    | value = dict_lsw["age"]                                      |
+| 修改（建存在）                          | if "age" in dict_lsw:<br />         dict_lsw["age"] = 38     |
+| 删除                                    | del dict["key"]                                              |
+| 获取所有的键                            | list(dict)                                                   |
+| 获取所有的值                            | list(dict.values())                                          |
+| 获取所有的键-值对                       | list(dict.items())                                           |
+
+字典遍历
+
+```python
+# 1. 遍历
+# 语法1：for 键 in 字典名:
+for key in dict_lsw:
+    print(key)
+    
+# 语法2：for 值 in 字典名.values():
+for value in dict_lsw.values():
+    print(value)
+    
+# 语法3：for 键,值 in 字典名.items():
+for key, value in dict_lsw.items():
+    print(key)
+    print(value)
+```
+
+字典推导式
+
+```python
+字典名 = {键的操作: 值的操作 for 变量 in 可迭代对象 if 条件}
+dict_result = {number: number ** 2 for number in range(1, 11)}
+
+dict_new = {key: value for key, value in dict_result.items() if key % 2 == 0}
+```
+
+## set
+
+|                                        |                                                             |
+| -------------------------------------- | ----------------------------------------------------------- |
+| 创建<br />集合名 = {数据1,数据2,数据3} | set_name = {"杨建蒙", "衣俊晓", "杨建蒙", "常磊", "杨建蒙"} |
+| 创建<br />集合名=set(list)             | list01 = [10, 20, 10, 10, 30]<br />set01 = set(list01)      |
+| 添加                                   | set_name.add("邱乾清")                                      |
+| 遍历                                   | for item in set_name:                                       |
+| 删除                                   | set_name.remove("吴宗净")                                   |
+
+set数学操作
+
+```python
+# 1. 交集&：返回共同元素。
+s1 = {1, 2, 3}
+s2 = {2, 3, 4}
+s3 = s1 & s2  # {2, 3}
+
+# 2.并集：返回不重复元素
+s1 = {1, 2, 3}
+s2 = {2, 3, 4}
+s3 = s1 | s2  # {1, 2, 3, 4}
+
+# 3.补集-：返回只属于其中之一的元素
+s1 = {1, 2, 3}
+s2 = {2, 3, 4}
+s3 = s1 - s2  # {1} 属于s1但不属于s2
+
+# 补集^：返回不同的的元素
+s1 = {1, 2, 3}
+s2 = {2, 3, 4}
+s3 = s1 ^ s2  # {1, 4}  等同于(s1-s2 | s2-s1)
+
+# 4.子集<    超集>
+s1 = {1, 2, 3}
+s2 = {2, 3}
+print(s2 < s1)  # True
+print(s1 > s2)  # True
+```
+
+## 函数
+
+### 函数内存图
+
+```python
+# 1. 将函数代码加载到内存图中,但是函数体内部代码不执行.
+def func01():
+    a = 10
+
+# 2. 调用函数时,在内存中开辟空间(栈帧).
+#     存储函数内部创建的变量
+func01()
+
+# 3. 函数执行后,该空间立即销毁
+
+def func02(p1, p2):
+    p1 = 100 # 修改栈帧中变量
+    # 2. 修改可变数据
+    p2[0] = 200 # 修改列表中的元素
+    # 3. 无需通过返回值传递结果
+
+# 1. 传入可变数据
+data01 = 10
+data02 = [20]
+func02(data01, data02)
+print(data01)#10
+print(data02)#[200]
+```
+
+### 局部变量，全局变量
+
+```python
+b = 20
+
+def func01():
+    # 局部作用域不能修改全局变量
+    # 如果必须修改,就使用global关键字声明全局变量
+    global b
+    b = 30
+
+func01()
+print(b)  # ?
+
+c = [30]
+
+def func02():
+    # 修改全局变量c还是修改列表第一个元素??
+    # 答：读取全局变量中数据,修改列表第一个元素
+    #    此时不用声明全局变量
+    c[0] = 300
+
+func02()
+print(c)  # [300]
+```
+
+
+
+### 函数参数
+
+```python
+"""
+    函数参数
+        实际参数：与形参对应
+            位置实参：按顺序
+                    函数名(数据1,数据2)
+                序列实参：拆分后
+                    函数名(*数据)
+            关键字实参：按名称
+                    函数名(形参名=数据)
+                字典实参：拆分后
+                    函数名(**数据)
+"""
+def func01(p1, p2, p3):
+    print(p1)
+    print(p2)
+    print(p3)
+
+# 1. 位置实参：根据顺序与形参对应
+func01(1, 2, 3)
+# TypeError: func01() missing 1 required positional argument: 'p3'
+# 错误：缺少一个位置实参
+# func01(1, 2)
+
+# TypeError: func01() takes 3 positional arguments but 4 were given
+# 错误：只需要3个位置实参,但是提供了4个
+# func01(1, 2, 3, 4)
+
+# 2. 关键字实参:根据名称与形参对应
+func01(p2=2, p1=1, p3=3)
+func01(p3=3, p2=2, p1=1)
+# 为什么要根据名称对应，请听下回分解.
+
+# func01(p3=3)
+# func01(p3=3, p2=2, p1=1,p4 = 4)
+
+# 3. 序列实参：将一个序列拆为多个元素,按顺序与形参对应
+list01 = [1, 2, 3]
+func01(*list01)
+
+tuple01 = (1, 2, 3)
+func01(*tuple01)
+
+str01 = "123"
+func01(*str01)
+
+# 4.字典实参：将一个字典拆为多个键值对,按名字与形参对应
+dict01 = {"p1": 1, "p3": 3, "p2": 2}
+func01(**dict01)
+```
+
+
+
+### 函数参数，星号元组参数
+
+```python
+# 星号元组形参     合
+# 作用：将多个位置实参合并为一个元组
+# 价值：可以让位置实参数量无限
+# 注意：建议命名为args
+def func01(*args):
+    print(args)
+
+
+func01()  # 空元组　()
+func01(1)  # (1,)
+func01(1, 2, 3)  # (1,2,3)
+# 不支持关键字实参
+# func01(p1=1)
+```
+
+
+
+命名关键字型参
+
+```python
+# 命名关键字形参:
+# 作用：要求必须是关键字实参
+# 价值：提高代码可读性
+# 写法1：星号元组形参后面的位置形参是命名关键字形参
+def func01(*args, p1, p2=0):
+    print(args)
+    print(p1)
+    print(p2)
+
+# func01(1, 2, 3, 4, 5)
+func01(1, 2, 3, p1=4, p2=5)
+func01(p1=4, p2=5)
+func01(p1=4)
+
+# 写法2：星号后面的位置形参是命名关键字形参
+# 注意：星号不是参数,只在修饰后面的参数是命名关键字形参
+def func02(p1, *, p2=0):
+    print(p1)
+    print(p2)
+
+func02(p1=4, p2=5)
+func02(4, p2=5)
+func02(4)
+
+# 命名关键字实参应用：
+# def print(*values, sep=' ', end='\n')
+# 我叫xx,今年xx岁了.
+name = "悟空"
+age = 10
+# print(f"我叫{name},今年{age}岁了.")
+# 因为print第一个参数是星号元组形参
+# 所以可以传递无限个位置实参
+print("我叫", name, ",今年", age, "岁了.", sep="")
+print("*", end=" ")
+print("*")
+
+print(1, 2, 3, sep="", end=" ")
+# print(1, 2, 3, "", " ")
+```
+
+
+
+### 双星号字典型参
+
+```python
+# 作用：将多个关键字实参合并为一个字典
+# 价值：关键字实参数量无限
+def func01(**kwargs):
+    print(kwargs)
+
+
+func01()  # {}
+func01(a=1, b=2)  # {'a': 1, 'b': 2}
+func01(p1=2, p2=2)  # {'p1': 2, 'p2': 2}
+
+
+# 应用：万能参数
+def func02(*args, **kwargs):
+    print(args)
+    print(kwargs)
+
+
+func02()
+func02(1, 2, 3)
+func02(a=1, b=2)
+func02(1, 2, 3, a=1, b=2) 
+```
+
+函数参数总结
+
+```python
+"""
+    函数参数
+        实际参数
+            位置实参：按顺序
+                    函数名(数据1,数据2)
+                序列实参：拆
+                    函数名(*序列)
+            关键字实参:按名字
+                     函数名(形参名1=数据1,形参名2=数据2)
+                字典实参：拆
+                     函数名(**字典)
+        形式参数：限制实参传递方式
+            默认形参:可选
+                    def 函数名(形参名1=数据1,形参名2=数据2)
+            位置形参:必填
+                    def 函数名(形参名1,形参名2)
+            命名关键字形参：必须是关键字实参
+                    def 函数名(*args,形参名1,形参名2)
+                    def 函数名(*,形参名1,形参名2)
+            不定长形参：数量无限
+                星号元组形参：位置实参
+                        def 函数名(*args)
+                双星号字典形参：关键字实参
+                        def 函数名(**kwargs)
+"""
+```
+
+
+
+## 面向对象
+
+### 实例成员
+
+```python
+class Wife:
+    def __init__(self, name="", age=0):
+        # 创建实例变量
+        self.name = name
+        self.age = age
+
+    # 实例方法：操作实例变量
+    def print_self(self):
+        print("我叫:", self.name, "今年", self.age, "岁了")
+
+
+jn = Wife("建宁")
+# 读取实例变量
+print(jn.name)
+
+# 该变量存储的是对象所有数据成员
+# 　{'name': '建宁'}
+print(jn.__dict__)
+# jn.__dict__["name"] = "建宁公主"
+jn.name = "建宁公主"
+print(jn.name)
+```
+
+
+
+### 类成员、类变量、类方法
+
+```python
+class ICBC:
+    # 类变量：总行的数据
+    total_money = 1000000
+
+    # 类方法：操作类变量
+    @classmethod
+    def print_total_money(cls): 
+        # cls 与 类名 相同
+        # print(ICBC.total_money)
+        print("总行有%d元" % cls.total_money)
+
+    def __init__(self, name="", money=0):
+        # 构造函数执行,意味着创建了一家支行
+        # 实例变量：某一支行的数据
+        self.name = name
+        self.money = money
+        # 总行的钱减少
+        ICBC.total_money -= money
+
+print(ICBC.total_money)
+ICBC.print_total_money()
+
+
+tiantan = ICBC("天坛支行", 100000)
+# print(ICBC.total_money)
+ICBC.print_total_money()
+
+taoranting = ICBC("陶然亭支行", 200000)
+# print(ICBC.total_money)
+ICBC.print_total_money()
+```
+
+
+
+全局变量 局部变量 类变量 实例变量
+
+```python
+# 全局变量：在文件中创建,全文件可用.
+data01 = 10
+
+
+def func01():
+    # 局部变量：在函数中创建,函数内部可用.
+    data02 = 20
+
+
+class MyClass:
+    # 类变量:在类中创建,通过类名访问
+    data04 = 40
+
+    def __init__(self):
+        # 实例变量：在构造函数中通过对象创建,通过对象访问.
+        self.data03 = 30
+
+
+m01 = MyClass()
+print(m01.data03)
+```
+
+
+
+内存图
+
+```python
+class MyClass:
+    data02 = 20 # 大家
+
+    def __init__(self):
+        self.data01 = 10 # 自己
+
+        self.data01 += 1  # 实例变量自增1
+        MyClass.data02 += 1  # 类变量自增1
+
+m01 = MyClass()
+m02 = MyClass()
+m03 = MyClass()
+print(m03.data01)  # 11
+print(MyClass.data02)  # 23
+```
+
+
+
+对象计数器
+
+```python
+"""
+    练习：对象计数器
+        统计构造函数执行的次数
+                使用类变量实现
+                画出内存图
+        class Wife:
+            pass
+        w01 = Wife("双儿")
+        w02 = Wife("阿珂")
+        w03 = Wife("苏荃")
+        w04 = Wife("丽丽")
+        w05 = Wife("芳芳")
+        print(w05.count) # 5
+        Wife.print_count()# 总共娶了5个老婆
+"""
+class Wife:
+    count = 0
+
+    @classmethod
+    def print_count(cls):
+        print(f"总共娶了{cls.count}个老婆")
+
+    def __init__(self, name=""):
+        # 实例变量：表达实物的多样性(每个人的名字不同)
+        self.name = name
+        Wife.count += 1
+
+w01 = Wife("双儿")  # 类变量：0 --> 1
+w02 = Wife("阿珂")  # 类变量：1 --> 2
+w03 = Wife("苏荃")  # 类变量：2 --> 3
+w04 = Wife("丽丽")  # 类变量：3 --> 4
+w05 = Wife("芳芳")  # 类变量：3 --> 5
+print(w05.count)  # 5
+Wife.print_count()  # 总共娶了5个老婆
+```
+
+
+
+```
+"""
+    小结 - 实例成员 与 类成员
+
+    class 类名:
+        变量名1 = 数据           # 创建类变量
+        def __init__(self):
+            self.变量名2 = 数据  # 创建实例变量
+
+        @classmethod           # 类方法：操作类变量
+        def 方法名1(cls):
+            通过cls操作类变量
+            不能操作实例成员
+
+        def 方法名2(self):      # 实例方法：操作实例变量
+            通过self操作实例变量
+            能操作类成员
+
+    访问类成员
+        类名.变量名1
+        类名.方法名1()
+
+    访问对象成员
+        对象 = 类名()
+        对象.变量名1
+        对象.方法名1()
+"""
+```
+
+
+
+### 封装数据
+
+```python
+# 面向对象
+class Commodity:
+    def __init__(self, cid=0, name="", price=0):
+        self.cid = cid
+        self.name = name
+        self.price = price
+
+list_commodity_infos = [
+    Commodity(1001, "屠龙刀", 10000),
+    Commodity(1002, "倚天剑", 10000),
+    Commodity(1003, "金箍棒", 52100),
+    Commodity(1004, "口罩", 20),
+    Commodity(1005, "酒精", 30),
+]
+
+def print_commodity_infos():
+    for commodity in list_commodity_infos:
+        print(f"编号:{commodity.name},商品名称:{commodity.name},商品单价:{commodity.price}")
+
+
+print_commodity_infos()
+```
+
+### 封装行为
+
+```python
+"""
+    封装行为 - 隐藏
+        本质：障眼法
+             看似是双下划线开头的变量   __data
+             实际是单下划线开头+类名+双下划线开头的变量  _MyClass__data
+        注意：类外不能访问,类内可以正常使用.
+        私有成员：
+            在类中,使用双下划线命名的成员
+        适用性：
+            不希望类外访问的成员
+"""
+
+class MyClass:
+    def __init__(self):
+        self.__data = 10
+
+    def __func01(self):
+        print("func01执行了")
+        print("私有变量是：", self.__data)
+
+m01 = MyClass()
+print(m01.__dict__)
+print(m01._MyClass__data)
+print(m01._MyClass__data)
+
+# dir函数可以获取该变量存储的数据所有成员
+print(dir(m01))
+# m01.__func01()
+m01._MyClass__func01()
+```
+
+面向对象编程
+
+```python
+"""
+    封装设计思想 - 划分多个类,再跨类调用
+        需求：老张开车去东北
+        划分类：找行为的不同
+
+        分析过程：
+            识别对象：
+                老张、老李、老孙 --> 属于数据不同,使用对象区分
+                    人类
+                车类、船类、飞机类、自行车类 --> 属于行为不同,使用类区分
+                东北、西北、陕北  --> 属于数据不同,使用对象区分
+                    不用做类(因为没有行为需要承担)
+
+            分配职责：
+                    人类 --> 去
+                    车类 --> 行驶
+
+            建立交互：
+                人类 调用 车类
+
+"""
+
+# 做法1：直接创建对象
+# 语义：老张每次去东北都使用一辆新车
+class Person:
+    def __init__(self, name=""):
+        self.name = name
+
+    def go_to(self, pos):
+        print(self.name, "去", pos)
+        c = Car()
+        c.run()
+
+class Car:
+    def run(self):
+        print("滴滴滴...")
+
+lz = Person("老张")
+lz.go_to("东北")
+
+# 做法2：在构造函数中创建对象
+# 语义：老张开自己的车去东北
+"""
+class Person:
+    def __init__(self, name=""):
+        self.name = name
+        self.c = Car()
+
+    def go_to(self, pos):
+        print(self.name, "去", pos)
+        self.c.run()
+
+class Car:
+    def run(self):
+        print("滴滴滴...")
+
+lz = Person("老张")
+lz.go_to("东北")
+"""
+
+# 做法3：通过参数传递对象
+# 语义：老张通过交通工具(参数)去东北
+"""
+class Person:
+    def __init__(self, name=""):
+        self.name = name
+
+    def go_to(self, pos, vehicle):
+        print(self.name, "去", pos)
+        vehicle.run()
+
+class Car:
+    def run(self):
+        print("滴滴滴...")
+
+lz = Person("老张")
+c = Car()
+lz.go_to("东北", c)
+"""
+```
+
+
+
+
+
+### 属性@property @setter
+
+```python
+# 保护数据有效性
+class Wife:
+    def __init__(self, name="", age=0):
+        self.name = name
+        self.age = age
+
+    @property
+    def age(self):
+        return self.__age
+
+    @age.setter
+    def age(self, value):
+        if 23 <= value <= 30:
+            self.__age = value
+        else:
+            raise Exception("我不要")
+
+
+w01 = Wife("双儿", 25)
+w01.age = 10
+print(w01.age)
+
+print(w01.__dict__)
+```
+
+property 原理
+
+```python
+"""
+    属性原理
+        属性 = 读取函数 + 写入函数
+"""
+
+class Wife:
+    def __init__(self, age=0):
+        # 因为先有age的类变量,所以本行代码访问类变量
+        self.age = age
+
+    def get_age(self):
+        return self.__age
+
+    def set_age(self, value):
+        # 因为被保护
+        # 所以实际存储数据的是私有变量__age
+        self.__age = value
+
+    # 创建属性对象
+    # 绑定读取函数
+    # 创建与实例变量名称相同的类变量(类变量先执行)
+    age = property(get_age)
+
+    # 调用属性的setter函数
+    # 绑定写入函数
+    # 将返回值(属性对象)赋值给类变量
+    age = age.setter(set_age)
+
+w01 = Wife(25)
+print(w01.age)
+```
+
+
+
+```python
+"""
+    属性 各种写法
+        保护实例变量
+            在读写过程中，增加逻辑判断
+            只能读取
+            只能写入
+    练习:exercise05
+"""
+
+# 写法1： 读写属性
+# 快捷键：props + 回车
+"""
+class MyClass:
+    def __init__(self, data):
+        self.data = data # 执行写入函数
+
+    @property
+    def data(self):
+        return self.__data
+
+    @data.setter
+    def data(self, value):
+        self.__data = value
+
+m01 = MyClass(10)
+print(m01.data)
+"""
+
+# 写法2： 只读属性
+# 快捷键：prop + 回车
+# 为私有变量,提供读取功能
+"""
+class MyClass:
+    def __init__(self, data):
+        self.__data = data
+
+    @property
+    def data(self):
+        return self.__data
+
+
+m01 = MyClass(10)
+print(m01.data)
+"""
+
+# 写法3： 只写属性
+# 快捷键：无
+
+class MyClass:
+    def __init__(self, data):
+        self.data = data
+
+    data = property()
+
+    @data.setter
+    def data(self, value):
+        self.__data = value
+
+    # def set_data(self, value):
+    #     self.__data = value
+    #
+    # data = property(None,set_data)
+
+m01 = MyClass(10)
+print(m01.__dict__)
+```
+
+### 继承
+
+```python
+# 多个类有共性,且都属于一个概念,可以创建父类
+
+class Person:
+    def say(self):
+        print("说话")
+
+class Teacher(Person):
+
+    def teach(self):
+        self.say()
+        print("教学")
+
+class Student(Person):
+    def play(self):
+        self.say()
+        print("玩耍")
+
+# 创建父类对象
+p01 = Person()
+# 只能访问父类成员
+p01.say()
+
+# 创建子类对象
+s01 = Student()
+# 能访问父类成员和子类成员
+s01.say()
+s01.play()
+
+# 关系判定相关函数
+# 1. isinstance( 对象 , 类型 )
+# 人对象 是一种 人类型
+print(isinstance(p01, Person))  # True
+# 学生对象 是一种 人类型
+print(isinstance(s01, Person))  # True
+# 学生对象 是一种 学生类型
+print(isinstance(s01, Student))  # True
+# 人对象 是一种 学生类型
+print(isinstance(p01, Student))  # False
+# 2. issubclass( 类型 , 类型 )
+# 人类型 是一种 人类型
+print(issubclass(Person, Person))  # True
+# 学生类型 是一种 人类型
+print(issubclass(Student, Person))  # True
+# 学生类型 是一种 学生类型
+print(issubclass(Student, Student))  # True
+# 人类型 是一种 学生类型
+print(issubclass(Person, Student))  # False
+# 3.  type(对象) == 类型
+# 人对象 是 人类型
+print(type(p01) == Person)  # True
+# 学生对象 是 人类型
+print(type(s01) == Person)  # False
+# 学生对象 是 学生类型
+print(type(s01) == Student)  # True
+# 人对象 是 学生类型
+print(type(p01) == Student)  # False
+```
+
+继承数据
+
+```python
+"""
+    继承数据
+        1. 子类没有构造函数,继承父类构造函数.
+        2. 子类有构造函数,创建子类对象时,使用子类。
+           (覆盖了,父类构造函数,好像它不存在)
+
+        class 子类(父类):
+            def __init__(self,父类构造函数参数,子类构造函数参数)：
+                super().__init__(父类构造函数参数)
+                self.数据 = 子类构造函数参数
+"""
+
+class Person:
+    def __init__(self, name="", age=0):
+        self.name = name
+        self.age = age
+
+class Student(Person):
+    # 子类构造函数:父类构造函数参数,子类构造函数参数
+    def __init__(self, name="", age=0, score=0):
+        # 通过super函数调用与子类同名的父类方法.
+        super().__init__(name, age)
+        self.score = score
+
+# 过程：调用子类构造函数,再调用父类构造函数
+wk = Student("悟空", 16, 100)
+print(wk.name)
+print(wk.age)
+print(wk.score)
+```
+
+
+
+### 重载
+
+```python
+"""
+    内置可重写函数
+        __str__
+    体会：
+        多态(重写) -- 彰显子类的个性
+"""
+
+# 任何类都直接或间接继承自object类
+class Person(object):
+    def __init__(self, name="", age=0, sex=""):
+        self.name = name
+        self.age = age
+        self.sex = sex
+
+    def __str__(self):
+        return f"我叫{self.name},今年{self.age}岁,性别{self.sex}."
+
+ak = Person("安康", 26, "男")
+# <__main__.Person object at 0x7f5ea31cde10>
+print(ak)  # 直接打印自定义对象
+# 本质：
+# 1. 调用自定义对象的__str__
+content = ak.__str__()
+# 2. 显示返回的字符串
+print(content)
+```
+
+
+
+```python
+"""
+    运算符重载
+        __add__
+"""
+
+class Vector2:
+    """
+        二维向量
+    """
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def __str__(self):
+        return "x分量:%d,y分量%d" % (self.x, self.y)
+
+    def __add__(self, other):
+        x = self.x + other.x
+        y = self.y + other.y
+        return Vector2(x, y)
+
+pos01 = Vector2(1, 2)
+pos02 = Vector2(3, 4)
+print(pos01 + pos02)  # pos01.__add__(pos02)
+```
+
+
+
+```python
+"""
+    运算符重载
+        +=
+        对于可变对象,+=应该在原对象基础上改变
+        对于不可变对象,+=应该创建新对象
+"""
+
+class Vector2:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def __str__(self):
+        return "x分量:%d,y分量%d" % (self.x, self.y)
+
+    # +
+    # def __add__(self, other):
+    #     x = self.x + other.x
+    #     y = self.y + other.y
+    #     return Vector2(x, y)
+
+    # +=
+    def __iadd__(self, other):
+        self.x += other.x
+        self.y += other.y
+        return self  # 返回原有数据
+
+pos01 = Vector2(1, 2)
+pos02 = Vector2(3, 4)
+print(id(pos01))
+pos01 += pos02
+print(id(pos01))
+print(pos01)
+
+list01 = [1]
+# print(id(list01))
+list01 += [2]
+# print(id(list01))
+print(list01)  # [1,2] 在原有列表基础上添加
+
+tuple01 = (1,)
+tuple01 += (2,)
+print(tuple01)  # (1,2) 产生新容器
+```
+
+
+
+```python
+"""
+比较关系重载
+
+"""
+class Commodity:
+    def __init__(self, cid=0, name="", price=0):
+        self.cid = cid
+        self.name = name
+        self.price = price
+
+    # 比较是否相同的判断标准：
+    def __eq__(self, other):
+        return self.cid == other.cid
+
+    # 比较是否大小的判断标准：
+    def __lt__(self, other):
+        return self.price  <  other.price
+
+
+list_commodity_infos = [
+    Commodity(1001, "屠龙刀", 10000),
+    Commodity(1002, "倚天剑", 10000),
+    Commodity(1003, "金箍棒", 52100),
+    Commodity(1004, "口罩", 20),
+    Commodity(1005, "酒精", 30),
+]
+
+c01 = Commodity(1001, "屠龙刀", 10000)
+c02 = Commodity(1001, "屠龙刀", 20000)
+
+# 以下内置函数,需要自定义类重写__eq__
+print(c01 == c02)  # true
+# count 判断列表中存储在元素数量
+print(list_commodity_infos.count(c01))
+# print(list_commodity_infos.remove(c01))
+print(c01 in list_commodity_infos)
+
+# 以下内置函数,需要自定义类重写__lt__
+# list_commodity_infos.sort()
+# print(list_commodity_infos)
+min_commodity = min(list_commodity_infos)
+print(min_commodity.__dict__)
+```
 
 
 
