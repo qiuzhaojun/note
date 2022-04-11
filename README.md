@@ -1,14 +1,18 @@
 
 
+
+
+
+
 ## numpy
 
-|      |                        |
-| ---- | ---------------------- |
-|      | np.logspace(0,2,num=5) |
-|      |                        |
-|      |                        |
-|      |                        |
-|      |                        |
+|                      |                                            |
+| -------------------- | ------------------------------------------ |
+|                      | np.logspace(0,2,num=5)                     |
+| 创建形状相同的数组   | np.**zeros_like**(ndarry, dtype = np.bool) |
+| 创建形状相同的空数组 | np.**empty_like**(ndarry)                  |
+|                      |                                            |
+|                      |                                            |
 
 'source C:/Users/qiuzhaojun/Desktop/数据库表实例构建/dump/craft_alarm_info.sql	source C:/Users/qiuzhaojun/Desktop/数据库表实例构建/dump/craft_station_info.sql	'
 
@@ -40,27 +44,126 @@
 | 创建表格 | pd.DataFrame(index=range(0,2),colums=['aa','bb']) |
 | 切片 | data.iloc[:, data.columns != 'Class']<br />参数可以true false ，也可以是索引值 |
 |  | data[data.Class == 1] |
-|  |  |
-|  |  |
-|  |  |
-|  |  |
-|  |  |
+| 获取列名 | data.**colums** |
+| 获取数据类型 | data.**dtypes** |
+| 删除所有缺失值 | data.col.**dropna()** |
+| 快速合并 | data.**join**(data2) |
+| 合并两个表 | pd.**concat**([data1,data2]) |
+
+特征相关性，返回上三角矩阵
+
+```python
+cormatrix = data.corr()
+cormatrix *= np.tri(*cormatrix.values.shape, k=-1).T
+```
+
+特征相关性重新堆叠stack
+
+```python
+cormatrix = cormatrix.stack()
+结果：
+symboling  symboling            0.000000
+           normalized-losses    0.593658
+           wheel-base          -0.536516
+           length              -0.363194
+           width               -0.247741
+                                  ...   
+price      horsepower           0.000000
+           peak-rpm            -0.000000
+           city-mpg            -0.000000
+           highway-mpg         -0.000000
+           price                0.000000
+Length: 256, dtype: float64
+```
+
+特征相关性按大小重新排序
+
+```
+cormatrix=cormatrix.reindex(cormatrix.abs().sort_values(ascending=False).index).reset_index()
+结果
+	level_0	level_1	0
+0	city-mpg	highway-mpg	0.971975
+1	engine-size	price	0.888778
+2	length	curb-weight	0.882694
+3	wheel-base	length	0.879307
+4	width	curb-weight	0.867640
+5	length	width	0.857368
+6	curb-weight	engine-size	0.857188
+7	engine-size	horsepower	0.845325
+8	curb-weight	price	0.835368
+9	horsepower	city-mpg	-0.833615
+10	wheel-base	width	0.818465
+```
+
+绘制相关性矩阵热力图
+
+```python
+# Compute the correlation matrix 
+corr_all = data.corr()
+
+# Generate a mask for the upper triangle
+mask = np.zeros_like(corr_all, dtype = np.bool)
+mask[np.triu_indices_from(mask)] = True
+
+# Set up the matplotlib figure
+f, ax = plt.subplots(figsize = (11, 9))
+
+# Draw the heatmap with the mask and correct aspect ratio
+sns.heatmap(corr_all, mask = mask,
+            square = True, linewidths = .5, ax = ax, cmap = "BuPu")      
+plt.show()
+```
+
+![](./img/crr_output.png)
+
+seaborn绘制特征相关性图
+
+```python
+sns.pairplot(data, hue = 'fuel-type', palette = 'plasma')
+```
+
+
+
+![](./img/sns_crr_output.png)
+
+
+
+用平均值代替填充缺失值
+
+```python
+# replacing 汽车价格预测 rf_car
+data = data.dropna(subset = ['price', 'bore', 'stroke', 'peak-rpm', 'horsepower', 'num-of-doors'])
+data['normalized-losses'] = data.groupby('symboling')['normalized-losses'].transform(lambda x: x.fillna(x.mean()))
+
+print('In total:', data.shape)
+data.head()
+```
+
+
 
 
 
 ## matplotlib
 
-|      解释      |                             函数                             |
-| :------------: | :----------------------------------------------------------: |
-|  导入pylot包   |                import matplotlib.pylot as plt                |
-|  定义画图函数  |                plt.figure(figuresize=(10,10))                |
-|    定义多图    |        plt.subplot(121)    1*2的图，其中这是第一张图         |
-|  设置图片标题  |                      plt.title("title")                      |
-|    画散点图    |                 plt.scatter(x,y,color='red')                 |
-| 设置坐标轴名称 |                    plt.xlabel("new name")                    |
-|  计算混淆矩阵  | from sklearn.metrics import confusion_matrix<br />**confusion_matrix**(ytrue,ypred) |
-|                |                                                              |
-|                |                                                              |
+|        解释         |                             函数                             |
+| :-----------------: | :----------------------------------------------------------: |
+|     导入pylot包     |                import matplotlib.pylot as plt                |
+|    定义画图函数     |                plt.figure(figuresize=(10,10))                |
+|      定义多图       |        plt.subplot(121)    1*2的图，其中这是第一张图         |
+|    设置图片标题     |                      plt.title("title")                      |
+|      画散点图       |                 plt.scatter(x,y,color='red')                 |
+|   设置坐标轴名称    |                    plt.xlabel("new name")                    |
+|    计算混淆矩阵     | from sklearn.metrics import confusion_matrix<br />**confusion_matrix**(ytrue,ypred) |
+|      画折线图       |                      plt.**plot**(x,y)                       |
+|      画直方图       |                      plt.**hist**(data)                      |
+| 绘制平行于x轴水平线 |          plt.**axhline**(lassocv_score, color = c)           |
+|                     |                                                              |
+|                     |                                                              |
+|                     |                                                              |
+|                     |                                                              |
+|                     |                                                              |
+|                     |                                                              |
+|                     |                                                              |
 
 ```python
 # 绘制混淆矩阵
@@ -109,11 +212,41 @@ def plot_confusion_matrix(cm, classes,
 | 计算距离     | from scipy.spatial import distance<br/>distance.euclidean(list1,list2) |
 | 交叉验证     | from sklearn.model_selection import KFold<br />KFold = **KFold**(len,n_splits=5,shuffle=True)<br />for train_index,test_index in **KFold.split**(datafram):<br />返回表格索引值index,type=ndarray |
 | 随机森林分类 | from sklearn.ensemble import RandomForestClassifier<br />**RandomForestClassifier**(n_estimators=n,max_depth=m) |
-| 划分数据集   | train_test_split(x,y,test_size=0.3)                          |
-| 召回率       | from sklearn.metrics import confusion_matrix,recall_score<br />recall_socre(yfact,ypred) |
+| 划分数据集   | **train_test_split**(x,y,test_size=0.3)                      |
+| 召回率       | from sklearn.metrics import confusion_matrix,recall_score<br />**recall_socre**(yfact,ypred) |
+| Lasso回归    | lasso = **Lasso**(random_state = seed，alpha = a)<br />lasso.**fit**(X_train, y_train)<br />scores[= lasso.**score**(X_test, y_test) |
+| Lassocv回归  | lassocv = **LassoCV**(cv = 10, random_state = seed)<br />lassocv.**fit**(features, target)<br />lassocv_score = lassocv.**score**(features, target)<br />lassocv_alpha = lassocv.**alpha_** |
+|              |                                                              |
+
+
+
+
+
+
+
+
+
+
+
+## missingno
+
+|            |                        |
+| ---------- | ---------------------- |
+| 画缺失值图 | missingno.matrix(data) |
+|            |                        |
+|            |                        |
+
+ECDF
+
+|              |                                                              |
+| ------------ | ------------------------------------------------------------ |
+| 累计经验分布 | df = ECDF(data['cols'])<br />df.x #分布范围 <br />df.y # 分布值 |
 |              |                                                              |
 |              |                                                              |
-|              |                                                              |
+
+
+
+
 
 # Python
 
@@ -129,13 +262,67 @@ def plot_confusion_matrix(cm, classes,
 
 
 
-## 时间
+## time
 
 |                |                                                            |
 | -------------- | ---------------------------------------------------------- |
 | 字符串时间格式 | time.strptime("%d-%d-%d" % (year, month, day), "%Y-%m-%d") |
 |                |                                                            |
 |                |                                                            |
+
+```python
+import time
+# 人类的时间　　公园元年　--> 2020 9 18
+# 1. 时间元组(年,月,日,时,分,秒,星期,一年的第几天,夏令时)
+tuple_time = time.localtime()
+print(tuple_time[0])
+print(tuple_time[6])
+print(tuple_time[3:6])  # 时,分,秒 (15,15,15)
+
+# 机器的时间   1970年元旦 --> 2020 9 18
+# 2. 时间戳(从1970年元旦到现在经过的秒数)
+print(time.time())  # 1600413415.692054
+
+# 3. 时间戳 --> 时间元组
+# 语法： 时间元组 = time.localtime(时间戳)
+print(time.localtime(1600413415.692054))
+
+#  时间元组 -> 时间戳
+# 语法：时间戳 = time.mktime( 时间元组  )
+print(time.mktime(tuple_time))
+print(time.mktime((2020, 9, 18, 0, 0, 0, 0, 0, 0)))
+
+# 4. 时间元组　与　字符串
+# 时间元组 --> 字符串
+# 语法：字符串 = time.strftime(格式,时间元组)
+print(time.strftime("%y/%m/%d %H:%M:%S",tuple_time))
+print(time.strftime("%Y/%m/%d %H:%M:%S",tuple_time))
+
+# 字符串-->时间元组
+# 语法：时间元组 = time.strptime(时间字符串,格式)
+print(time.strptime("2020/09/18 15:30:38","%Y/%m/%d %H:%M:%S"))
+```
+
+
+
+```python
+"""
+    定义函数,根据年月日,计算星期.
+    结果：星期一　　星期二　　星期三　　
+"""
+import time
+
+def get_week(year, month, day):
+    tuple_time = time.strptime("%d-%d-%d" % (year, month, day), "%Y-%m-%d")
+    index_week = tuple_time[6]
+    tuple_weeks = ("星期一","星期二","星期三","星期四","星期五","星期六","星期日")
+    return tuple_weeks[index_week]
+
+
+print(get_week(2020, 9, 18))  # 星期五
+```
+
+
 
 ## 变量、数据
 
@@ -1283,7 +1470,977 @@ min_commodity = min(list_commodity_infos)
 print(min_commodity.__dict__)
 ```
 
+### 多态
 
+```python
+"""
+    老张开车去东北
+        需求变化：飞机、船、小黄车...
+        封装：分
+            人      车
+        继承：隔
+        多态
+    缺点：违反面向对象设计原则 - 开闭
+    允许增加新功能,不允许修改客户端代码
+"""
+class Person:
+    def __init__(self, name=""):
+        self.name = name
+
+    def go_to(self, vehicle):
+        print("去...")
+        # 如果是汽车
+        if type(vehicle) == Car:
+            vehicle.run()
+        # 否则如果是飞机
+        elif type(vehicle) == Airplane:
+            vehicle.fly()
+
+class Car:
+    def run(self):
+        print("汽车行驶")
+
+
+class Airplane:
+    def fly(self):
+        print("嗖嗖嗖")
+
+zl = Person("老张")
+bm = Car()
+fj = Airplane()
+zl.go_to(bm)
+```
+
+多继承
+
+```python
+"""
+    多继承
+        为了隔离多个维度的变化
+        同名方法解析顺序：
+            类名.mro()
+        调用某个父类的同名方法:
+            类名.实例方法名(self)
+"""
+class A:
+    def func01(self):
+        print("A - func01")
+
+class B(A):
+    def func01(self):
+        print("B - func01")
+        super().func01()
+
+class C(A):
+    def func01(self):
+        print("C - func01")
+        super().func01()
+
+class D(B, C):
+    def func01(self):
+        print("D - func01")
+        # 调用的是Ｂ类型
+        super().func01()
+        # 调用的是C类型
+        C.func01(self)
+
+d = D()
+d.func01()  #
+# [<class '__main__.D'>, <class '__main__.B'>, <class '__main__.C'>, <class '__main__.A'>, <class 'object'>]
+print(D.mro())
+```
+
+## 模块导入
+
+```python
+"""
+    模块
+        导入方式
+"""
+# 标记项目根目录（蓝色）
+# 在文件夹上右键 -> Mark Directory as -> Sources Root
+
+# 方式1：“我过去”
+# 语法：import 模块名
+# 使用：模块名.成员
+# 适用性：更适合面向过程(全局变量、函数)
+import module01
+module01.func01()
+
+# 方式2：“你过来”
+# 语法：from 模块名 import 成员
+# 使用：直接使用成员
+# 适用性：更适合面向对象(类)
+# 注意：导入的成员可能与当前作用域成员冲突
+from module01 import func01
+from module01 import *
+
+func01()
+```
+
+
+
+```python
+"""
+    python程序结构
+
+    根目录(文件夹)
+        包package
+            模块
+                类
+                    函数
+                        语句
+"""
+# 绝对路径：导入包中模块时,路径从项目根目录开始写
+#          （不写项目根目录）
+
+# 方式一："我过去"
+# import package01.package02.module02 as m
+#
+# m.func01()
+
+# 方式二："你过来"
+from package01.package02.module02 import func01
+
+# from package01.package02.module02 import *
+#
+func01()
+```
+
+
+
+```python
+"""
+    包中的__init__.py模块
+        适用性：导入路径是包时
+        作用：决定对外提供包内的什么成员
+
+练习:通过导入包的方式
+   在main.py中调用skill_manager.py中实例方法。
+   在skill_manager.py中调用list_helper.py中类方法。
+"""
+# import 包 as p
+import package01.package02 as p2
+p2.module02.func01()
+p2.func03()
+
+import package01 as p1
+
+p1.m2.func01()
+p1.func03()
+print(p1.data01)
+```
+
+```python
+"""
+    模块相关知识
+"""
+
+# 1. 模块变量
+# (1)文档注释
+print(__doc__)
+
+# 会执行review模块的代码(第一次)
+import review
+
+# print(review.__doc__)
+
+# 打印主模块(第一次执行的模块)的模块名,一定是__main__
+# 打印被导入的模块名,是真实模块名.
+
+print(review.__name__)
+
+# 2. 导入模块是否成功的唯一标准
+# 导入路径 + 系统路径 = 真实路径
+#　解释：
+# (1) 导入路径: import 路径
+#              from 路径 import ...
+# (2) 系统路径:sys.path
+#     [根目录,....]
+```
+
+## 异常
+
+```python
+"""
+    主动创造异常
+        目的：快速传递错误信息
+        语法：
+            "发送消息"
+                raise Exception(传递的信息)
+            "接收消息"
+                try:
+
+                except Exception as 变量:
+                    变量.args
+"""
+
+class Wife:
+    def __init__(self, age=0):
+        self.age = age
+
+    @property
+    def age(self):
+        return self.__age
+
+    @age.setter
+    def age(self, value):
+        if 25 <= value <= 35:
+            self.__age = value
+        else:
+            # 人为制造异常：快速传递错误信息的技术
+            raise Exception("我不要", 1001, "if 25 <= value <= 35")
+            # "发送"
+
+# "接收"
+while True:
+    try:
+        age = int(input("请输入年龄："))
+        w01 = Wife(age)
+        print(w01.age)
+        break
+    except Exception as e:
+        print("年龄超过范围")
+        print(e.args)
+```
+
+## 迭代器
+
+```python
+"""
+    迭代
+        迭代iter ation：每次获取下一个元素的过程
+        迭代器iter ator：执行迭代过程的对象
+                具有__next__函数
+        可迭代对象iter able：可以被迭代的对象
+                具有__iter__函数
+"""
+message = "我是齐天大圣孙悟空"
+# for item in message:
+#     print(item)
+# for 循环原理
+# 1. 获取迭代器对象
+iterator = message.__iter__()
+while True:
+    try:
+        # 2. 获取下一个元素
+        item = iterator.__next__()
+        print(item)
+        # 3. 如果遇到StopIteration错误,则停止.
+    except StopIteration:
+        break
+```
+
+### 自定义迭代器
+
+```python
+"""
+    自定义迭代器
+        需求：for自定义对象
+"""
+
+class SkillIterator: # 技能迭代器
+    def __init__(self, data):
+        self.__data = data
+        self.__index = -1
+
+    def __next__(self):
+        # 如果索引是最大的或者超过了，则停止迭代
+        if self.__index >= len(self.__data) - 1:
+            raise StopIteration()
+        self.__index += 1
+        return self.__data[self.__index]
+
+class SkillController: # 技能可迭代对象
+    def __init__(self):
+        self.__skills = []
+
+    def add_skill(self, skill):
+        self.__skills.append(skill)
+
+    def __iter__(self):
+        return SkillIterator(self.__skills)
+
+controller = SkillController()
+controller.add_skill("六脉神剑")
+controller.add_skill("降龙十八掌")
+controller.add_skill("打狗棍")
+controller.add_skill("如来神掌")
+
+# for item in controller:
+#     print(item)
+
+iterator = controller.__iter__()
+while True:
+    try:
+        item = iterator.__next__()
+        print(item)  #
+    except StopIteration:
+        break
+```
+
+### yield
+
+```python
+"""
+    迭代器  --> yield
+        练习1:修改商品管理器
+        exercise06
+"""
+class SkillController:
+    def __init__(self):
+        self.__skills = []
+
+    def add_skill(self, skill):
+        self.__skills.append(skill)
+
+    def __iter__(self):
+        for item in self.__skills:
+            yield item
+            print("----")
+
+""" 
+    def __iter__(self):
+        # 生成迭代器代码的大致规则：
+        # 1. 将yield以前的代码定义到__next__函数体中
+        # 2. 将yield以后的数据作为__next__函数返回值
+        # 3. 最后一个__next__函数在创造异常raise StopIteration()
+        print("准备数据")
+        yield self.__skills[0]
+
+        print("准备数据")
+        yield self.__skills[1]
+
+        print("准备数据")
+        yield self.__skills[2]
+
+        print("准备数据")
+        yield self.__skills[3]
+"""
+
+controller = SkillController()
+controller.add_skill("六脉神剑")
+controller.add_skill("降龙十八掌")
+controller.add_skill("打狗棍")
+controller.add_skill("如来神掌")
+
+for item in controller:
+    print(item)
+
+iterator = controller.__iter__()
+while True:
+    try:
+        item = iterator.__next__()
+        print(item)  #
+    except StopIteration:
+        break
+```
+
+
+
+```python
+class MyRange:
+    def __init__(self, stop):
+        self.__stop = stop
+
+    def __iter__(self):
+        number = 0
+        while number < self.__stop:
+            yield number
+            number += 1
+
+m01 = MyRange(5)
+iterator = m01.__iter__()
+while True:
+    try:
+        item = iterator.__next__()
+        print(item)
+    except StopIteration:
+        break
+```
+
+
+
+### 生成器函数
+
+```python
+"""
+    MyRange 3.0 生成器函数
+"""
+"""
+class Generator: # 生成器 = 可迭代对象 + 迭代器
+    def __iter__(self): # 可迭代对象
+        return self
+    
+    def __next__(self): # 迭代器
+        准备数据
+        return 数据
+"""
+
+
+def my_range(stop):
+    number = 0
+    while number < stop:
+        yield number
+        number += 1
+
+# for number in my_range(5):
+#     print(number)
+
+m01 = my_range(5) # 创建生成器对象Generator()
+iterator = m01.__iter__()
+while True:
+    try:
+        item = iterator.__next__()
+        print(item)
+    except StopIteration:
+        break
+```
+
+
+
+
+
+```python
+"""
+    生成器应用
+        价值：
+            产生大量数据,不用容器存储.节省内存
+        适用性：
+            函数向外返回多个数据使用yield
+            函数向外返回单个数据使用return
+"""
+list01 = [4, 4, 565, 67, 7, 8, 89, 90]
+
+# 传统思想：用容器存储所有结果
+# def find_gt_10():
+#     result = []
+#     for number in list01:
+#         if number > 10:
+#             result.append(number)
+#     return result
+#
+# data = find_gt_10()
+# for item in data:
+#     print(item)
+
+def find_gt_10():
+    for number in list01:
+        if number > 10:
+            yield number
+
+# 惰性操作/延迟操作 (创建生成器对象 - 推算数据)
+# 循环一次 计算一次 返回一次
+data = find_gt_10()
+for item in data:
+    print(item)
+```
+
+
+
+内置生成器
+
+```python
+"""
+    内置生成器
+        enumerate
+"""
+list01 = [43, 54, 65, 6, 7, 89]
+# 获取元素
+for item in list01:
+    print(item)
+
+# 获取索引
+for i in range(len(list01)):
+    print(list01[i])
+
+# 获取索引 和 元素
+for i, item in enumerate(list01):
+    print(i, item)
+
+# 需求：将列表中大于10的数字设置为10
+for i, item in enumerate(list01):
+    if item > 10:
+        list01[i] = 10
+
+print(list01)
+```
+
+
+
+```python
+"""
+    内置生成器
+        zip
+"""
+list_name = ["屠龙刀", "倚天剑", "菜刀"]
+list_price = [10000, 10000, 99]
+list_cid = [1001, 1002, 1003]
+
+class Commodity:
+    def __init__(self, name="", price=0, cid=0):
+        self.name = name
+        self.price = price
+        self.cid = cid
+
+# item 是 元组(三个列表每列数据)
+for item in zip(list_name, list_price, list_cid):
+    print(item)
+
+# list_commodity = []
+# for item in zip(list_name, list_price, list_cid):
+#     # commodity = Commodity(item[0],item[1],item[2]   )
+#     commodity = Commodity(*item)
+#     list_commodity.append(commodity)
+
+# 将面向过程的数据,封装为面向对象的数据
+list_commodity = [Commodity(*item)
+                  for item in zip(list_name, list_price, list_cid)]
+print(list_commodity)
+# list_datas =[
+#     ["屠龙刀", "倚天剑", "菜刀"],
+#     [10000, 10000, 99],
+#     [1001, 1002, 1003]
+# ]
+# list_commodity = [Commodity(*item)
+#                   for item in zip(*list_datas)]
+# print(list_commodity)
+```
+
+
+
+函数式作为参数
+
+```python
+"""
+    函数式作为参数
+        适用性：多段代码,主体相同,核心不同.
+        思想：
+            分：提取相同代码,分离出不同代码.
+            隔：使用参数抽象不同代码,在相同代码中先行确定调用方法(统一)
+            做：再增加新的不同代码,添加新函数
+"""
+list01 = [43, 54, 5, 65, 76, 87, 9]
+
+
+# 定义函数,在列表中查找所有大于10的数字
+def find_all01():
+    for item in list01:
+        if item > 10:
+            yield item
+
+
+# 定义函数,在列表中查找所有小于50的数字
+def find_all02():
+    for item in list01:
+        if item < 50:
+            yield item
+
+
+# 分-变化的
+def condition01(item):
+    return item > 10
+
+
+def condition02(item):
+    return item < 50
+
+
+# 分-相同的
+def find_all(func_condition):
+    for item in list01:
+        # if item < 50:
+        # if condition01(item):
+        # if condition02(item):
+        # 先行确定调用方法
+        if func_condition(item):
+            yield item
+
+
+# def condition03(a,b):
+#     return a > b
+
+for item in find_all(condition01):
+    print(item)
+```
+
+### IterableHelper
+
+```python
+from common.iterator_tools import IterableHelper
+
+list01 = [43, 54, 5, 65, 76, 87, 9]
+
+
+def condition01(item):
+    return item > 10
+
+
+for item in IterableHelper.find_all(list01, condition01):
+    print(item)
+```
+
+### lambda
+
+```python
+"""
+    lambda 表达式
+        匿名函数:函数没有名称,只有参数与函数体
+        语法：lambda 参数:函数体
+        与普通函数的异同：
+            都是创建函数的技术,
+            lambda可以完成的函数都能使用传统函数实现.
+            但是lambda不支持:在函数体中赋值
+                           函数体中多语句
+"""
+# 1. 有参数 有返回值
+# def func01(p1,p2):
+#     return p1 > p2
+#
+#
+# print(func01(1, 2))
+func01 = lambda p1, p2: p1 > p2
+
+print(func01(1, 2))
+
+# 2. 有参数 无返回值
+# def func02(p1):
+#     print("func02执行了,参数是:", p1)
+#
+#
+# func02(100)
+
+
+func02 = lambda p1: print("func02执行了,参数是:", p1)
+func02(100)
+
+# 3. 无参数 有返回值
+# def func03():
+#     return "大爷"
+#
+# print(func03())
+
+func03 = lambda: "大爷"
+print(func03())
+
+# 4. 无参数 无返回值
+# def func04():
+#     print("func04执行了")
+#
+# func04()
+
+func04 = lambda: print("func04执行了")
+
+func04()
+
+
+# 5. lambda不支持的写法
+# (1) 函数体不支持赋值语句
+# def func05(p1):
+#     p1[0] = 100
+#
+#
+# list01 = [10]
+# func05(list01)
+# print(list01)  # [100]
+
+# func05 = lambda p1:p1[0] = 100
+
+# (2) 函数体只能有一条语句
+# def func06(p1):
+#     for item in range(p1):
+#         print(item)
+#
+# func06(5)
+
+# func06 = lambda p1:for item in range(p1): print(item)
+```
+
+
+
+```python
+"""
+    lambda的作用
+        作为函数的实参
+"""
+
+from common.iterator_tools import IterableHelper
+
+list01 = [43, 54, 5, 65, 76, 87, 9]
+
+# def condition01():
+#     return item > 10
+
+# for item in IterableHelper.find_all(list01, condition01):
+#     print(item)
+
+
+for item in IterableHelper.find_all(list01,lambda item: item > 10):
+    print(item)
+```
+
+### map、filter、max、sorted
+
+```python
+"""
+    内置高阶函数
+"""
+from common.iterator_tools import IterableHelper
+
+
+class Employee:
+    def __init__(self, eid, did, name, money):
+        self.eid = eid  # 员工编号
+        self.did = did  # 部门编号
+        self.name = name
+        self.money = money
+
+# 员工列表
+list_employees = [
+    Employee(1001, 9002, "师父", 60000),
+    Employee(1002, 9001, "孙悟空", 50000),
+    Employee(1003, 9002, "猪八戒", 20000),
+    Employee(1004, 9001, "沙僧", 30000),
+    Employee(1005, 9001, "小白龙", 15000),
+]
+
+# 1. 映射
+# for item in IterableHelper.select(list_employees,lambda emp:(emp.eid,emp.name)):
+#     print(item)
+
+# 生成器 = map(lambda,可迭代对象)
+for item in map(lambda emp: (emp.eid, emp.name), list_employees):
+    print(item)
+
+# 2. 过滤器
+# for emp in IterableHelper.find_all(list_employees,lambda item:item.did == 9002):
+#     print(emp.__dict__)
+
+# 生成器 = filter(lambda,可迭代对象)
+for emp in filter(lambda item: item.did == 9002, list_employees):
+    print(emp.__dict__)
+
+# 3. 获取极值(最大最小) max   min
+# re = IterableHelper.get_max(list_employees,lambda element:element.money)
+# print(re.__dict__)
+
+# 元素 = max(可迭代对象,key = lambda)
+re = max(list_employees, key=lambda element: element.money)
+print(re.__dict__)
+
+# 4.
+# IterableHelper.order_by(list_employees,lambda item:item.money)
+#
+# for item in list_employees:
+#     print(item.__dict__)
+
+# 升序排列
+# 新列表 = sorted(可迭代对象,key = lambda)
+
+# 降序排列(翻转后的升序排列)
+# 新列表 = sorted(可迭代对象,key = lambda,reverse=True)
+result = sorted(list_employees, key=lambda item: item.money, reverse=True)
+for item in result:
+    print(item.__dict__)
+```
+
+### 全排列
+
+```python
+"""
+    排列组合
+        全排列(笛卡尔积)
+        语法：
+            生成器 = itertools.product(多个可迭代对象)
+        价值：
+            需要全排列的数据可以未知
+"""
+import itertools
+
+list_datas = [
+    ["香蕉", "苹果", "哈密瓜"],
+    ["牛奶", "可乐", "雪碧", "咖啡"]
+]
+# 两个列表全排列需要两层循环嵌套
+# n              n
+# list_result = []
+# for r in list_datas[0]:
+#     for c in list_datas[1]:
+#         list_result.append((r, c))
+# print(list_result)
+
+list_result = list(itertools.product(*list_datas))
+print(list_result)
+```
+
+### 排列
+
+```python
+"""
+    排列
+        从n个元素中取出m个元素,并按照顺序进行排列。
+        n! / (n-m)!
+        语法：
+        生成器 = itertools.permutations(可迭代对象,数量)
+
+"""
+# 从6个人中取出3个人,演出。
+# 6 × 5 × 4  --> 120
+list_persons = ["郭德纲", "岳云鹏", "qtx", "孙悟空", "奥特曼", "刘欢"]
+import itertools
+
+list_result = list(
+    itertools.permutations(list_persons, 3))
+print(len(list_result))
+print(list_result)
+```
+
+### 组合
+
+```python
+"""
+    组合
+        从n个元素中取出m个元素。
+        不考虑m个元素的顺序
+        语法：
+            生成器 = itertools.combinations(可迭代对象, 数量))
+"""
+# 从6个人中取出4个人,不考虑顺序。
+list_persons = ["郭德纲", "岳云鹏", "qtx", "孙悟空", "奥特曼", "刘欢"]
+import itertools
+
+list_result = list(
+    itertools.combinations(list_persons, 4))
+print(len(list_result))
+print(list_result)
+```
+
+## 外部嵌套作用域
+
+```python
+"""
+    Enclosing  外部嵌套作用域 ：函数嵌套。
+"""
+def func01():
+    # 相对于函数外,是局部作用域
+    # 相对于内部函数,外部嵌套作用域
+    a = 10
+
+    def func02():
+        print(a)
+
+    func02()
+
+func01()
+
+def func03():
+    a = 10
+
+    def func04():
+        # 如果修改外部嵌套变量,必须通过nonlocal声明
+        nonlocal a
+        a = 20
+
+    func04()
+    print(a)  # 20
+
+func03()
+```
+
+### 闭包
+
+```python
+"""
+    闭包
+        三大要素：
+            有内有外
+            内访问外
+            外返回内
+        字面意思:封闭　　内存空间
+        作用：外部栈帧执行后不释放,
+             等待内部函数执行时使用.
+"""
+
+
+def func01():
+    a = 10
+
+    def func02():
+        print(a)
+
+    return func02
+
+
+# 调用外部函数,接收内部函数
+result = func01()
+# 调用内部函数
+result()
+```
+
+### 装饰器
+
+```python
+"""
+    装饰器
+        核心价值：拦截
+            一个函数如果使用了装饰器,那么再被调用的时候,
+            执行的就是装饰器的内部函数.
+        适用性：增加的新功能,以后经常会替换。
+
+"""
+# 新函数(新功能)
+def new_func(func): # 接收旧功能
+    def wrapper(): # 包裹新旧功能
+        print("new_func执行了")  # 执行新功能
+        func()  # 执行旧功能
+
+    return wrapper # 返回包裹函数(不执行新旧功能)
+
+# 原函数(旧功能)
+@new_func  # func01 = new_func(func01)
+def func01():
+    print("func01执行了")
+
+@new_func
+def func02():
+    print("func02执行了")
+# 旧功能 = 新功能 + 旧功能
+# func01 = new_func + func01
+
+# 调用外部函数,接收内部函数
+# func01 = new_func(func01)
+
+# 调用内部函数
+func01()
+func02()
+```
+
+
+
+```python
+"""
+    装饰器语法细节 - 参数
+"""
+
+def new_func(func):
+    def wrapper(*args, **kwargs):  # 多个实参 合为 一个形参(元组/字典)
+        print("new_func执行了")
+        result = func(*args, **kwargs)  # 一个实参 拆 多个形参
+        return result
+
+    return wrapper
+
+@new_func
+def func01(p1):
+    print("func01执行了", p1)
+
+@new_func
+def func02(p1, p2):
+    print("func02执行了", p1, p2)
+
+func01(10)
+func02(20, p2 = 30)
+```
 
 # database
 
@@ -1344,7 +2501,7 @@ print(min_commodity.__dict__)
 
 对文件实现读写的基本操作步骤为：打开文件，读写文件，关闭文件。
 
-#### 1.2.1 打开文件
+ 1.2.1 打开文件
 
 ```python
 file_object = open(file_name, access_mode='r', buffering=-1，encoding=None)
@@ -1377,7 +2534,7 @@ file_object = open(file_name, access_mode='r', buffering=-1，encoding=None)
 
 
 
-#### 1.2.2 读取文件
+ 1.2.2 读取文件
 
 * 方法1
 
@@ -1416,7 +2573,7 @@ for line in f:
 
 
 
-#### 1.2.3 写入文件
+ 1.2.3 写入文件
 
 * 方法1
 ```python
@@ -1436,7 +2593,7 @@ writelines(str_list)
 
 
 
-#### 1.2.4 关闭文件
+ 1.2.4 关闭文件
 
 打开一个文件后我们就可以通过文件对象对文件进行操作了，当操作结束后可以关闭文件操作
 
@@ -1451,7 +2608,7 @@ file_object.close()
 
 
 
-#### 1.2.5 with操作
+ 1.2.5 with操作
 
 python中的with语句也可以用于访问文件，在语句块结束后会自动释放资源。
 
@@ -1472,7 +2629,7 @@ with open('file','r+') as f:
 
 
 
-#### 1.2.6 缓冲区
+ 1.2.6 缓冲区
 
 * 定义
 
@@ -1507,7 +2664,7 @@ file_obj.flush()
 
 
 
-#### 1.2.7 文件偏移量
+ 1.2.7 文件偏移量
 
 * 定义
 
@@ -1862,7 +3019,7 @@ Out: ['is']
 
 
 
-#### 2.3.1 特殊字符匹配
+ 2.3.1 特殊字符匹配
 
 * 目的 ： 如果匹配的目标字符串中包含正则表达式特殊字符，则在表达式中元字符就想表示其本身含义时就需要进行 \ 处理。
 
@@ -1882,7 +3039,7 @@ Out: ['123', '-123', '1.23', '-1.23']
 
 
 
-#### 2.3.2 贪婪模式和非贪婪模式
+ 2.3.2 贪婪模式和非贪婪模式
 
 * 定义
 
@@ -1911,7 +3068,7 @@ Out: ['(abcd)', '(higk)']
 
 
 
-#### 2.3.3 正则表达式分组
+ 2.3.3 正则表达式分组
 
 * 定义
 
@@ -1952,7 +3109,7 @@ Out: 'ab'
 
 
 
-#### 2.3.4 正则表达式匹配原则
+ 2.3.4 正则表达式匹配原则
 
 1. 正确性,能够正确的匹配出目标字符串.
 2. 排他性,除了目标字符串之外尽可能少的匹配其他内容.
@@ -1964,7 +3121,7 @@ Out: 'ab'
 
 
 
-#### 2.4.1 基础函数使用
+ 2.4.1 基础函数使用
 
 ------
 
@@ -2008,7 +3165,7 @@ Out: 'ab'
 
 
 
-#### 2.4.2  生成match对象
+ 2.4.2  生成match对象
 
 ```python
  re.finditer(pattern,string,flags = 0)
@@ -2041,7 +3198,7 @@ re.search(pattern,string,flags=0)
 
 
 
-#### 2.4.3 match对象使用
+ 2.4.3 match对象使用
 
 
 - span()  获取匹配内容的起止位置
@@ -2062,7 +3219,7 @@ re.search(pattern,string,flags=0)
 
 
 
-#### 2.4.4 flags参数扩展
+ 2.4.4 flags参数扩展
 
 
 
@@ -2278,7 +3435,7 @@ drop database test;
   2. 明确字段构成
   3. 确定字段数据类型
 
-#### 3.5.1 基础数据类型
+ 3.5.1 基础数据类型
 
 * 数字类型：
   * 整数类型：INT，SMALLINT，TINYINT，MEDIUMINT，BIGINT
@@ -2311,7 +3468,7 @@ drop database test;
 
 
 
-#### 3.5.2 表的基本操作
+ 3.5.2 表的基本操作
 
 * 创建表
 
@@ -2353,7 +3510,7 @@ create table interest (id int primary key auto_increment,name varchar(32) not nu
 
 ### 3.6 表数据基本操作
 
-#### 3.5.1 插入(insert)
+ 3.5.1 插入(insert)
 
 ```SQL
 insert into 表名 values(值1),(值2),...;
@@ -2368,7 +3525,7 @@ insert into class_1 (name,age,sex,score) values ('Lucy',17,'w',81);
 
 ```
 
-#### 3.6.2 查询(select)
+ 3.6.2 查询(select)
 
 ```SQL
 select * from 表名 [where 条件];
@@ -2383,7 +3540,7 @@ select name,age from class_1;
 
 
 
-#### 3.6.3 where子句
+ 3.6.3 where子句
 
 where子句在sql语句中扮演了重要角色，主要通过一定的运算条件进行数据的筛选，在查询，删除，修改中都有使用。
 
@@ -2435,7 +3592,7 @@ select * from class_1 where sex='m' and age>9;
 
 
 
-#### 3.6.4 更新表记录(update)
+ 3.6.4 更新表记录(update)
 
 ```SQL
 update 表名 set 字段1=值1,字段2=值2,... where 条件;
@@ -2450,7 +3607,7 @@ update class_1 set age=11 where name='Abby';
 
 
 
-#### 3.6.5 删除表记录（delete）
+ 3.6.5 删除表记录（delete）
 
 ```SQL
 delete from 表名 where 条件;
@@ -2464,7 +3621,7 @@ delete from class_1 where name='Abby';
 
 
 
-#### 3.6.6 表字段的操作(alter)
+ 3.6.6 表字段的操作(alter)
 
 ```SQL
 语法 ：alter table 表名 执行动作;
@@ -2492,7 +3649,7 @@ alter table hobby change tel phone char(16);
 
 
 
-#### 3.5.7 时间类型数据
+ 3.5.7 时间类型数据
 
 * 日期 ： DATE
 * 日期时间： DATETIME，TIMESTAMP
@@ -2739,7 +3896,7 @@ values (1, '曹操', '男', '魏', 256, 63),
 聚合操作指的是在数据查找基础上对数据的进一步整理筛选行为，实际上聚合操作也属于数据的查询筛选范围。
 
 
-#### 3.8.1 聚合函数
+ 3.8.1 聚合函数
 
 | 方法          | 功能                 |
 | ------------- | -------------------- |
@@ -2772,7 +3929,7 @@ select count(*) from sanguo where attack > 200;
 
 
 
-#### 3.8.2 聚合分组
+ 3.8.2 聚合分组
 
 - **group by**
 
@@ -2804,7 +3961,7 @@ limit 2;
 
 
 
-#### 3.8.3 聚合筛选
+ 3.8.3 聚合筛选
 
 - **having语句**
 
@@ -2827,7 +3984,7 @@ limit 2;
 
 
 
-#### 3.8.4 去重语句
+ 3.8.4 去重语句
 
 - **distinct语句**
 
@@ -2844,7 +4001,7 @@ eg2 : 计算一共有多少个国家
 
 
 
-#### 3.8.5 聚合运算
+ 3.8.5 聚合运算
 
 - **查询表记录时做数学运算**
 
@@ -2871,7 +4028,7 @@ eg2: 更新蜀国所有英雄攻击力 * 2
 
 ### 3.9 索引操作
 
-#### 3.9.1 概述
+ 3.9.1 概述
 
 - **定义**
 
@@ -2887,7 +4044,7 @@ eg2: 更新蜀国所有英雄攻击力 * 2
 > 2. 对于数据量很少的表或者经常进行写操作而不是查询操作的表不适合创建索引
 
 
-#### 3.9.2 索引分类
+ 3.9.2 索引分类
 
 *  普通(MUL) 
 
@@ -2903,7 +4060,7 @@ eg2: 更新蜀国所有英雄攻击力 * 2
 
 
 
-#### 3.9.3 索引创建
+ 3.9.3 索引创建
 
 * 创建表时直接创建索引
 ```mysql
@@ -2963,7 +4120,7 @@ show profiles  查看语句执行信息
 
 ### 3.10 外键约束和表关联关系
 
-#### 3.10.1 外键约束
+ 3.10.1 外键约束
 
 * 约束 : 约束是一种限制，它通过对表的行或列的数据做出限制，来确保表的数据的完整性、唯一性
 * foreign key 功能 : 建立表与表之间的某种约束的关系，由于这种关系的存在，能够让表与表之间的数据，更加的完整，关连性更强，为了具体说明创建如下部门表和人员表。
@@ -3056,7 +4213,7 @@ CREATE TABLE person (
 
   
 
-#### 3.10.2 表关联设计
+ 3.10.2 表关联设计
 
 当我们应对复杂的数据关系的时候，数据表的设计就显得尤为重要，认识数据之间的依赖关系是更加合理创建数据表关联性的前提。常见的数据关系如下：
 
@@ -3136,7 +4293,7 @@ CREATE TABLE athlete_item (
 
 
 
-#### 3.10.3 E-R模型
+ 3.10.3 E-R模型
 
 * **定义**		
 
@@ -3181,7 +4338,7 @@ E-R模型(Entry-Relationship)即 实体-关系 数据模型,用于数据库设�
 
 ![](./img/er.PNG)
 
-#### 3.10.4 表连接
+ 3.10.4 表连接
 
 如果多个表存在一定关联关系，可以多表在一起进行查询操作，其实表的关联整理与外键约束之间并没有必然联系，但是基于外键约束设计的具有关联性的表往往会更多使用关联查询查找数据。
 
@@ -3393,7 +4550,7 @@ create view  c1 as select name,age from class_1;
 
 存储过程和函数是事先经过编译并存储在数据库中的一段sql语句集合，调用存储过程和函数可以简化应用开发工作，提高数据处理的效率。
 
-#### 3.12.1 函数创建
+ 3.12.1 函数创建
 
 ```sql
 delimiter 自定义符号　　-- 如果函数体只有一条语句, begin和end可以省略, 同时delimiter也可以省略
@@ -3451,7 +4608,7 @@ select queryNameById(1);
 
 
 
-#### 3.12.2存储过程创建
+ 3.12.2存储过程创建
 
 创建存储过程语法与创建函数基本相同，但是没有返回值。
 
@@ -3514,7 +4671,7 @@ call p_out(@num)
 
 
 
-#### 3.12.3 存储过程和存储函数操作
+ 3.12.3 存储过程和存储函数操作
 
 1. 调用存储过程
 
@@ -3568,7 +4725,7 @@ DROP {PROCEDURE | FUNCTION} [IF EXISTS] sp_name
 
 
 
-#### 3.12.4 函数和存储过程区别
+ 3.12.4 函数和存储过程区别
 
 1. 函数有且只有一个返回值，而存储过程不能有返回值。
 2. 函数只能有输入参数，而存储过程可以有in,out,inout多个类型参数。
@@ -3579,7 +4736,7 @@ DROP {PROCEDURE | FUNCTION} [IF EXISTS] sp_name
 
 ### 3.13 事务控制
 
-#### 3.13.1 事务概述
+ 3.13.1 事务概述
 
 MySQL 事务主要用于处理操作量大，复杂度高的数据。比如说，在人员管理系统中，你删除一个人员，既需要删除人员的基本资料，也要删除和该人员相关的信息，如信箱，文章等等，如果操作就必须同时操作成功，如果有一个不成功则所有数据都不动。这时候数据库操作语句就构成一个事务。事务主要处理数据的增删改操作。
 
@@ -3593,7 +4750,7 @@ MySQL 事务主要用于处理操作量大，复杂度高的数据。比如说�
 > 确保数据操作过程中的安全。
 
 
-#### 3.13.2 事务操作
+ 3.13.2 事务操作
 
 
 1. 开启事务
@@ -3610,7 +4767,7 @@ MySQL 事务主要用于处理操作量大，复杂度高的数据。比如说�
 > 注意：事务操作只针对数据操作。rollback不能对数据库，数据表结构操作恢复。
 
 
-#### 3.13.3 事务四大特性
+ 3.13.3 事务四大特性
 
 1. 原子性（atomicity）
 
@@ -3632,7 +4789,7 @@ MySQL 事务主要用于处理操作量大，复杂度高的数据。比如说�
 
 
 
-####  3.13.4 事务隔离级别
+  3.13.4 事务隔离级别
 
 事务四大特性中的隔离性是在使用事务时最为需要注意的特性，因为隔离级别不同带来的操作现象也有区别
 
@@ -3673,7 +4830,7 @@ MySQL 事务主要用于处理操作量大，复杂度高的数据。比如说�
 
 
 
-#### 3.14.1 数据库设计范式
+ 3.14.1 数据库设计范式
 
 设计关系数据库时，遵从不同的规范要求，设计出合理的关系型数据库，这些不同的规范要求被称为不同的范式。
 
@@ -3694,7 +4851,7 @@ MySQL 事务主要用于处理操作量大，复杂度高的数据。比如说�
 
 
 
-#### 3.14.2  MySQL存储引擎
+ 3.14.2  MySQL存储引擎
 
 * **定义**： mysql数据库管理系统中用来处理表的处理器
 
@@ -3751,7 +4908,7 @@ MySQL 事务主要用于处理操作量大，复杂度高的数据。比如说�
 
 
 
-#### 3.14.3 字段数据类型选择
+ 3.14.3 字段数据类型选择
 
 - 优先程度   数字 >  时间日期 > 字符串
 - 同一级别   占用空间小的 > 占用空间多的
@@ -3766,7 +4923,7 @@ MySQL 事务主要用于处理操作量大，复杂度高的数据。比如说�
 
 
 
-#### 3.14.4 键的设置
+ 3.14.4 键的设置
 
 - Innodb如果不设置主键也会自己设置隐含的主键，所以最好自己设置
 - 尽量设置占用空间小的字段为主键
@@ -3775,7 +4932,7 @@ MySQL 事务主要用于处理操作量大，复杂度高的数据。比如说�
 
 
 
-#### 3.14.5 explain语句
+ 3.14.5 explain语句
 
 使用 EXPLAIN 关键字可以模拟优化器执行SQL查询语句，从而知道MySQL是如何处理你的SQL语句的。这可以帮你分析你的查询语句或是表结构的性能瓶颈。通过explain命令可以得到:
 
@@ -3818,7 +4975,7 @@ type中包含的值：
 
 
 
-#### 3.14.6 SQL优化
+ 3.14.6 SQL优化
 
 - 尽量选择数据类型占空间少，在where ，group by，order by中出现的频率高的字段建立索引
 
@@ -3854,7 +5011,7 @@ type中包含的值：
 
 
 
-#### 3.14.7 表的拆分
+ 3.14.7 表的拆分
 
 垂直拆分 ： 表中列太多，分为多个表，每个表是其中的几个列。将常查询的放到一起，blob或者text类型字段放到另一个表
 
@@ -3866,7 +5023,7 @@ type中包含的值：
 
 
 
-#### 3.15.1 表的复制
+ 3.15.1 表的复制
 
 1. 表能根据实际需求复制数据
 2. 复制表时不会把KEY属性复制过来
@@ -3879,7 +5036,7 @@ create table 表名 select 查询命令;
 
 
 
-#### 3.15.2 数据备份
+ 3.15.2 数据备份
 
 1. 备份命令格式
 > mysqldump -u  用户名  -p  源库名  >  ~/stu.sql
@@ -3890,7 +5047,7 @@ create table 表名 select 查询命令;
 
 
 
-#### 3.15.3 用户权限管理
+ 3.15.3 用户权限管理
 
 **开启MySQL远程连接**
 
@@ -4172,7 +5329,7 @@ Git
 
 
 
-#### 2.2.1 初始配置
+ 2.2.1 初始配置
 
 * 配置命令： git config --global [选项]
 * 配置文件位置:  ~/.gitconfig
@@ -4201,7 +5358,7 @@ git config --list
 
 
 
-#### 2.2.2 基本命令
+ 2.2.2 基本命令
 
 * 初始化仓库
 
@@ -4393,7 +5550,7 @@ git tag -d  [tag]
 
 ### 2.5 分支管理
 
-#### 2.5.1 基本概念
+ 2.5.1 基本概念
 
 * 定义: 分支即每个人在原有代码（分支）的基础上建立自己的工作环境，完成单独开发，之后再向主分支统一合并工作内容。
 
@@ -4405,7 +5562,7 @@ git tag -d  [tag]
 
     ![](./img/fz.jpg)
 
-#### 2.5.2 基本操作
+ 2.5.2 基本操作
 
 * 查看现有分支
 
@@ -4449,7 +5606,7 @@ git tag -d  [tag]
 
   ![分支合并](./img/merge.png)
 
-#### 2.5.3 分支冲突问题
+ 2.5.3 分支冲突问题
 
 * 定义： 当分支合并时，原来的父分支发生了变化，在合并过程中就会产生冲突问题，这是合并分支过程中最为棘手的问题。
 
@@ -4492,7 +5649,7 @@ git tag -d  [tag]
 
 
 
-#### 2.6.1 获取项目
+ 2.6.1 获取项目
 
 - 在左上角搜索栏搜索想要的获取的项目
 
@@ -4515,7 +5672,7 @@ git clone https://github.com/xxxxxxxxx
 
 
 
-#### 2.6.2 创建自己的项目仓库
+ 2.6.2 创建自己的项目仓库
 
 - 点击右上角加号下拉菜单，选择新的仓库
 
@@ -4577,7 +5734,7 @@ git clone https://github.com/xxxxxxxxx
 
 
 
-#### 2.6.3 远程仓库操作命令
+ 2.6.3 远程仓库操作命令
 
 * 将本地分支推送给远程仓库
 
@@ -4685,7 +5842,7 @@ git clone https://github.com/xxxxxxxxx
 
 
 
-#### 1.1.1 什么是网络
+ 1.1.1 什么是网络
 
 * 什么是网络 : 计算机网络功能主要包括实现资源共享，实现数据信息的快速传递。
 
@@ -4693,7 +5850,7 @@ git clone https://github.com/xxxxxxxxx
 
   ![](./img/n2.png)
 
-#### 1.1.2 网络通信标准
+ 1.1.2 网络通信标准
 
 * 面临问题
 
@@ -4738,7 +5895,7 @@ git clone https://github.com/xxxxxxxxx
 
     ![](./img/n7.jpg)
 
-#### 1.1.3  通信地址
+ 1.1.3  通信地址
 
 
 * IP地址
@@ -4787,7 +5944,7 @@ git clone https://github.com/xxxxxxxxx
     * 一台计算机上的网络应用所使用的端口不会重复
     * 通常 0——1023 的端口会被一些有名的程序或者系统服务占用，个人一般使用 > 1024的端口
 
-#### 1.1.4 服务端与客户端
+ 1.1.4 服务端与客户端
 
 * 服务端（Server）：服务端是为客户端服务的，服务的内容诸如向客户端提供资源，保存客户端数据，处理客户端请求等。
 
@@ -4799,7 +5956,7 @@ git clone https://github.com/xxxxxxxxx
 
 ### 1.2 UDP 传输方法
 
-#### 1.2.1 套接字简介
+ 1.2.1 套接字简介
 
 * 套接字(Socket) ： 实现网络编程进行数据传输的一种技术手段,网络上各种各样的网络服务大多都是基于 Socket 来完成通信的。
 
@@ -4808,7 +5965,7 @@ git clone https://github.com/xxxxxxxxx
 * Python套接字编程模块：import  socket
 
 
-#### 1.2.3  UDP套接字编程
+ 1.2.3  UDP套接字编程
 
 * 创建套接字
 
@@ -4866,7 +6023,7 @@ sockfd.close()
 
 
 
-#### 1.2.4  UDP套接字特点
+ 1.2.4  UDP套接字特点
 
 * 可能会出现数据丢失的情况
 * 传输过程简单，实现容易
@@ -4879,7 +6036,7 @@ sockfd.close()
 
 
 
-#### 1.3.1 TCP传输特点
+ 1.3.1 TCP传输特点
 
 
 
@@ -4906,7 +6063,7 @@ sockfd.close()
 
 ![](./img/1_schs.png)
 
-#### 1.3.2 TCP服务端
+ 1.3.2 TCP服务端
 
 
 
@@ -4966,7 +6123,7 @@ n = connfd.send(data)
 
 
 
-#### 1.3.3 TCP客户端 
+ 1.3.3 TCP客户端 
 
 
 
@@ -4993,7 +6150,7 @@ sockfd.connect(server_addr)
 
 
 
-#### 1.3.4 TCP套接字细节
+ 1.3.4 TCP套接字细节
 
 * tcp连接中当一端退出，另一端如果阻塞在recv，此时recv会立即返回一个空字串。
 
@@ -5022,7 +6179,7 @@ sockfd.connect(server_addr)
 
 
 
-#### 1.3.5 TCP与UDP对比
+ 1.3.5 TCP与UDP对比
 
 * 传输特征
   * TCP提供可靠的数据传输，但是UDP则不保证传输的可靠性
@@ -5051,7 +6208,7 @@ sockfd.connect(server_addr)
 
 
 
-#### 1.4.1 传输流程
+ 1.4.1 传输流程
 
 * 发送端由应用程序发送消息，逐层添加首部信息，最终在物理层发送消息包。
 * 发送的消息经过多个节点（交换机，路由器）传输，最终到达目标主机。
@@ -5061,7 +6218,7 @@ sockfd.connect(server_addr)
 
 
 
-#### 1.4.2 TCP协议首部（了解）
+ 1.4.2 TCP协议首部（了解）
 
 ![](./img/1_tcpsjb.png)
 
@@ -5156,7 +6313,7 @@ sockfd.connect(server_addr)
 
 ### 2.2 进程（Process）
 
-#### 2.2.1 进程概述
+ 2.2.1 进程概述
 
 * 定义： 程序在计算机中的一次执行过程。
 
@@ -5214,7 +6371,7 @@ sockfd.connect(server_addr)
 
     * 父子进程：在Linux操作系统中，进程形成树形关系，任务上一级进程是下一级的父进程，下一级进程是上一级的子进程。
 
-#### 2.2.2 多进程编程
+ 2.2.2 多进程编程
 
 * 使用模块 ： multiprocessing
 
@@ -5284,7 +6441,7 @@ p.join([timeout])
 
 
 
-#### 2.2.3 进程处理细节
+ 2.2.3 进程处理细节
 
 
 
@@ -5333,7 +6490,7 @@ sys.exit(info)
 
          
 
-#### 2.2.5 创建进程类
+ 2.2.5 创建进程类
 
 进程的基本创建方法将子进程执行的内容封装为函数。如果我们更热衷于面向对象的编程思想，也可以使用类来封装进程内容。
 
@@ -5359,7 +6516,7 @@ sys.exit(info)
 
 
 
-#### 2.2.4 进程池
+ 2.2.4 进程池
 
 * 必要性
   
@@ -5413,7 +6570,7 @@ pool.join()
 
 
 
-#### 2.2.5 进程通信
+ 2.2.5 进程通信
 
 * 必要性： 进程间空间独立，资源不共享，此时在需要进程间数据传输时就需要特定的手段进行数据通信。
 * 常用进程间通信方法：消息队列，套接字等。
@@ -5474,7 +6631,7 @@ pool.join()
 
 
 
-#### 2.3.1 线程概述
+ 2.3.1 线程概述
 
 * 什么是线程
   
@@ -5508,7 +6665,7 @@ pool.join()
 
   ![](./img/n21.jpg)
 
-#### 2.3.2 多线程编程
+ 2.3.2 多线程编程
 
 * 线程模块： threading
 
@@ -5553,7 +6710,7 @@ t = Thread()
 
 
 
-#### 2.3.3 创建线程类
+ 2.3.3 创建线程类
 
 1. 创建步骤
    
@@ -5579,7 +6736,7 @@ t = Thread()
 
 
 
-#### 2.3.4 线程同步互斥
+ 2.3.4 线程同步互斥
 
 * 线程通信方法： 线程间使用全局变量进行通信
 
@@ -5634,7 +6791,7 @@ with  lock:  上锁
 
 
 
-#### 2.3.5 死锁
+ 2.3.5 死锁
 
 * 什么是死锁
 
@@ -5660,7 +6817,7 @@ with  lock:  上锁
 
 
 
-#### 2.3.6 GIL问题
+ 2.3.6 GIL问题
 
 * 什么是GIL问题 （全局解释器锁）
 
@@ -5692,7 +6849,7 @@ with  lock:  上锁
 
 
 
-#### 2.3.7 进程线程的区别联系
+ 2.3.7 进程线程的区别联系
 
 * 区别联系
 
@@ -5740,7 +6897,7 @@ with  lock:  上锁
 * 缺点： 资源消耗较大
 * 适用情况：客户端请求较复杂，需要长时间占有服务器。
 
-#### 3.1.1 多进程并发模型
+ 3.1.1 多进程并发模型
 
 * 创建网络套接字用于接收客户端请求
 * 等待客户端连接
@@ -5750,7 +6907,7 @@ with  lock:  上锁
 
 
 
-#### 3.1.2 多线程并发模型
+ 3.1.2 多线程并发模型
 
 - 创建网络套接字用于接收客户端请求
 - 等待客户端连接
@@ -5782,7 +6939,7 @@ with  lock:  上锁
 
 
 
-#### 3.2.1 IO概述
+ 3.2.1 IO概述
 
 * 什么是IO
 
@@ -5796,7 +6953,7 @@ with  lock:  上锁
 
   
 
-#### 3.2.2 阻塞IO
+ 3.2.2 阻塞IO
 
   * 定义：在执行IO操作时如果执行条件不满足则阻塞。阻塞IO是IO的默认形态。
   * 效率：阻塞IO效率很低。但是由于逻辑简单所以是默认IO行为。
@@ -5808,7 +6965,7 @@ with  lock:  上锁
 
 
 
-#### 3.2.3 非阻塞IO 
+ 3.2.3 非阻塞IO 
 
 * 定义 ：通过修改IO属性行为，使原本阻塞的IO变为非阻塞的状态。
 
@@ -5832,7 +6989,7 @@ with  lock:  上锁
 
   
 
-#### 3.2.4 IO多路复用
+ 3.2.4 IO多路复用
 
 * 定义
 
@@ -5913,7 +7070,7 @@ events = p.poll()
 
 
 
-#### 3.2.5 IO并发模型
+ 3.2.5 IO并发模型
 
 利用IO多路复用等技术，同时处理多个客户端IO请求。
 
@@ -5943,7 +7100,7 @@ events = p.poll()
 
 ### 4.1 HTTP协议
 
-#### 4.1.1 协议概述
+ 4.1.1 协议概述
 
 * 用途 ： 网页获取，数据的传输
 * 特点
@@ -5955,7 +7112,7 @@ events = p.poll()
 
 
 
-#### 4.1.2 网页访问流程
+ 4.1.2 网页访问流程
 
 1. 客户端（浏览器）通过tcp传输，发送http请求给服务端
 2. 服务端接收到http请求后进行解析
@@ -5965,7 +7122,7 @@ events = p.poll()
 
 ![](./img/2_wzfw.png)
 
-#### 4.1.2 HTTP请求
+ 4.1.2 HTTP请求
 
 - 请求行 ： 具体的请求类别和请求内容
 
@@ -5995,7 +7152,7 @@ Accept-Encoding: gzip
 
  ![](./img/request.jpg)
 
-#### 4.1.3 HTTP响应
+ 4.1.3 HTTP响应
 
 - 响应行 ： 反馈基本的响应情况
 
@@ -6087,3 +7244,1493 @@ Content-Length:109\r\n
 实际工作中，应对更庞大的任务场景，网络并发模型的使用有时也并不单一。比如多进程网络并发中每个进程再开辟线程，或者在每个进程中也可以使用多路复用的IO处理方法。
 
 ​	
+
+# Linux 操作系统
+
+| Python 教学部 |
+| ------------- |
+| Author：吕泽  |
+
+------
+
+
+
+##  1. Linux操作系统认知
+
+### 1.1 操作系统（Operation System简称OS）
+
+* 定义
+
+  操作系统是管理计算机硬件与软件资源的计算机程序，同时也是计算机系统的内核与基石。操作系统需要处理如管理与配置内存、决定系统资源供需的优先次序、控制输入设备与输出设备、操作网络与管理文件系统等基本事务。
+  
+  ![](./img/OS.png)
+
+
+
+* 操作系统功能
+
+  > 1. 管理好硬件设备，为用户提供调用方法
+  > 2. 是计算机中最重要的系统环境
+  > 3. 管理各种其他的软件和程序的运行
+  > 4. 对系统中文件进行管理
+
+* 操作系统分类
+
+  > 1. 桌面系统：Windows ，macOS为主，图形界面良好用户群体大。
+  > 2. 服务器系统：Linux，Unix为主，安全，稳定，费用低占有量大。windows占有率很低。
+  > 3. 嵌入式系统：Linux为主，主要用于小型只能设备，如只能 手机，机器人等。
+
+### 1.2 Linux系统介绍
+
+* Linux 诞生
+
+  1991 年 **林纳斯（Linus）** 就读于赫尔辛基大学期间，对 Unix 产生浓厚兴趣，林纳斯 经常要用他的终端 仿真器（Terminal Emulator） 去访问大学主机上的新闻组和邮件，为了方便读写和下载文件，他自己编写了磁盘驱动程序和文件系统，这些在后来成为了 Linux 第一个内核的雏形，当时，他年仅 21 岁！林纳斯利用C做工具，编写了 Linux 内核，一开始 Linux 并不能兼容 Unix只适用于 386，后来经过全世界的网友的帮助，最终能够兼容多种硬件。
+
+  ![Linus](img/linus.png)
+
+* Linux系统特点
+
+  * Linux是一款免费的操作系统
+  * 支持多种平台
+  * 支持多用户
+  * 具有非常强大的网络功能
+
+* Linux 应用领域
+
+  * Linux 服务器 : 目前是服务器系统中最广泛一种。
+
+    ![](./img/server.jpg)  
+
+  * 桌面应用: 新版本的Linux系统特别在桌面应用方面进行了改进，达到相当的水平  
+
+  * 嵌入式系统：由于Linux系统开放源代码，功能多样且具有极大的伸缩性，因此在嵌入式应用的领域有很广阔的应用市场。
+
+* Linux系统构成
+
+  * 内核: Linux操作系统的核心代码，是Linux系统的心脏，提供了系统的核心功能，用来与硬件交互。
+
+    Linux内核官网 : [http://www.kernel.org](http://www.kernel.org)
+
+  * 文件系统：通常指称管理磁盘数据的系统，可将数据以目录或文件的型式存储。每个文件系统都有自己的特殊格式与功能
+
+  * 命令解释器：它使得用户能够与操作系统进行交互，负责接收用户命令，然后调用操作系统功能。
+
+  * 应用软件：包含桌面系统和基础的软件操作工具等。
+
+  ![Linux](img/linux.jpg)
+
+* Linux发型版本
+
+  严格的来讲，Linux 只是一个系统内核，即计算机软件与硬件通讯之间的平台。一些组织或厂家将 Linux 内核与GNU软件（系统软件和工具）整合起来，并提供一些安装界面和系统设定与管理工具，这样就构成了一个发型套件，目前市面上较知名的发行版有：Ubuntu、RedHat、CentOS、Debian、Fedora、SuSE、OpenSUSE、Arch Linux、SolusOS 等。
+
+### 1.3 文件系统
+
+* 定义
+
+  文件系统是计算机操作系统的重要的组成部分，用于组织和管理计算机存储设备上的大量文件。
+
+* 文件系统结构
+
+  * 熟悉的windows文件系统，分不同盘符
+
+  ![windows上文件系统](./img/win.png)
+
+  * Linux的文件组织中没有盘符。将根（/）作为整个文件系统的唯一起点，其他所有目录都从该点出发。
+
+![Linux文件系统](./img/Linux_f.png)
+
+​    
+
+  犹如一颗倒置的树，所有存储设备作为这颗树的一个子目录。
+
+![Linux](img/linux_fs.jpg)
+
+
+
+* 普通文件和目录
+
+  - 普通文件：包括文本，压缩包，音频视频等文件都是普通文件。
+  - 目录：即文件夹，在Linux系统下多称之为目录。
+
+  ![](./img/dir.png)
+
+  
+
+* 主要目录功能
+
+```reStructuredText
+1. /bin目录
+
+  /bin目录包含了引导启动所需的命令或普通用户可能用的命令(可能在引导启动后)。这些命令都是二进制文件的可执行程序(bin是binary----二进制的简称)，多是系统中重要的系统文件。
+
+2. /sbin目录
+
+  /sbin目录类似/bin，也用于存储二进制文件。因为其中的大部分文件多是系统管理员使用的基本的系统程序，所以虽然普通用户必要且允许时可以使用，但一般不给普通用户使用。
+
+3. /etc目录
+
+  /etc目录存放着各种系统配置文件，其中包括了用户信息文件/etc/ passwd，系统初始化文件/etc/rc等。linux正是因为这些文件才得以正常地运行。
+
+4. /root目录
+
+  /root 目录是超级用户的目录。
+
+5. /lib目录
+
+  /lib目录是根文件系统上的程序所需的共享库，存放了根文件系统程序运行所需的共享文件。这些文件包含了可被许多程序共享的代码，以避免每个程序都包含有相同的子程序的副本，故可以使得可执行文件变得更小，节省空间。
+
+6. /dev目录
+
+  /dev目录存放了设备文件，即设备驱动程序，用户通过这些文件访问外部设备。比如，用户可以通过访问/dev/mouse来访问鼠标的输入，就像访问其他文件一样。
+
+7. /usr文件系统
+
+  /usr 是个很重要的目录，通常这一文件系统很大，因为所有程序安装在这里。本地安装的程序和其他东西在/usr/local 下，因为这样可以在升级新版系统或新发行版时无须重新安装全部程序。
+
+8. /var文件系统
+
+  /var 包含系统一般运行时要改变的数据。通常这些数据所在的目录的大小是要经常变化或扩充的。
+
+9. /home
+
+  /home 普通用户的默认目录，在该目录下，每个用户拥有一个以用户名命名的文件夹。
+
+```
+
+
+
+* 绝对路径和相对路径表达
+  * 绝对路径：指文件在文件系统中以根目录为起始点的准确位置描述。例如“/usr/bin/gnect”就是绝对路径。最要的标志就是以 ‘/’ 作为路径描述的开头。
+  * 相对路径：指相对于用户当前位置为起始点，对一个文件位置的逐层描述。例如，用户处在usr目录中时，只需要“games/gnect”就可确定这个文件。在相对路径描述时  .  表示当前目录,   ..  表示上一级目录。
+
+### 1.4 Ubuntu使用 
+
+作为Linux发行版中的后起之秀，Ubuntu Linux在短短几年时间里便迅速成长为从Linux初学者到资深专家都十分青睐的发行版。由于Ubuntu Linux是开放源代码的自由软件，用户可以登录Ubuntu Linux的官方网址免费下载该软件的安装包。
+
+Ubuntu官网：[https://ubuntu.com/](https://ubuntu.com/)
+
+![ubuntu](./img/ubuntu.png)
+
+
+
+## 2. Linux常用命令
+
+* 学习目的
+  1. Linux下有非常丰富的命令，可以用来完成大部分重要的Linux服务器操作维护功能，而且至今有些功能仍然通过命令操作比较方便。
+  2. 实际工作中，大量服务器维护工作都是工程师通过远程控制来完成的，并没有图形界面，这时维护工作都需要通过命令来完成。
+  3. 作为后端工程师，我们将来所写的代码都需要在服务器上运行，掌握基本的Linux 操作命令有助于我们将来对项目的部署和控制工作。
+
+
+
+### 2.1 终端与命令行
+
+* 终端 ： 使用命令对Linux系统进行操作的窗口
+* 命令行：书写Linux命令的提示行
+
+![](./img/zd.png)
+
+
+
+* 打开关闭终端方法
+  * 点击图形界面终端图标，通过ctrl+alt +t  ,shift+ctrl + t  , shift+ctrl+n 都可以快速打开一个终端。
+  * 通过图形界面关闭，或者在命令行输入exit。
+* 终端字体大小控制
+  * 放大 摁住  ctrl 和 + 号 （不要忘了+号要使用shift）
+  * 缩小 摁住  ctrl 和 -  号 
+
+
+
+### 2.2 Linux常用命令
+
+* 命令格式 
+
+  ```shell
+  command [-options] [parameter]
+  
+  说明：
+  command：命令名称，一般为英文单词或单词的缩写
+  [-options]：命令选项，辅助命令进行功能细化，也可以省略
+  parameter：传给命令的参数，可以是0个或多个
+  ```
+
+
+
+ 2.2.1 帮助命令
+
+```bash
+command --help
+```
+
+说明：
+
+> 显示 `command` 命令的帮助信息
+
+
+
+```bash
+man command
+```
+
+说明：
+
+- 查阅 `command` 命令的使用手册,摁q退出
+
+
+
+ 2.2.2 基础操作命令
+
+| 序号 | 命令           | 作用                     |
+| :--- | :------------- | :----------------------- |
+| 01   | ls             | 查看当前文件夹下的内容   |
+| 02   | pwd            | 查看当前所在文件夹       |
+| 03   | cd [目录名]    | 切换文件夹               |
+| 04   | touch [文件名] | 如果文件不存在，新建文件 |
+| 05   | mkdir [目录名] | 创建目录                 |
+| 06   | rm [文件名]    | 删除指定的文件名         |
+| 07   | cp             | 复制一个文件             |
+| 08   | mv             | 移动一个文件             |
+| 09   | clear          | 清屏                     |
+
+* 部分命令细节说明
+  * ls ：  -l 展示详细信息，-a展示隐藏文件（Linux下 . 开头的为隐藏文件）。
+  * cd： 参数为绝对路径或者相对路径，直接cd表示回到主目录。
+  * touch:  可以同时跟多个参数表示创建多个文件。
+  * mkdir: -p选项可以创建层目录
+  * cp：如果拷贝的是一个目录需要使用 -r ，同时这个命令有另存为的作用
+  * mv:  即使移动目录页不需要选项，有重命名的作用。
+  * rm：删除表示直接删除，无法找回，如果删除目录需要加 -r选项
+  * clear：等同于ctrl-l，清空屏幕。
+
+
+
+> 小技巧： 使用Tab键可以自动补全文件名，目录名等信息
+
+
+
+* 通配符
+
+  * 作用：对一类文件名称的书写进行简化，例如file1.txt、file2.txt、file3.txt……，用户不必一一输入文件名，可以使用通配符完成。
+
+    
+
+  | 通配符            | 含义                   | 实例                                                         |
+  | ----------------- | ---------------------- | ------------------------------------------------------------ |
+  | **星号（\*）**    | 匹配任意长度的字符串   | 用file_\*.txt，匹配file_wang.txt、file_Lee.txt、file_Liu.txt |
+  | 问号（?）         | 匹配一个长度的字符     | 用flie_?.txt，匹配file_1.txt、file_2.txt、file_3.txt         |
+  | **方括号（**[…]） | 匹配其中指定的一个字符 | 用file_[otr].txt，匹配file_o.txt、file_r.txt和file_t.txt     |
+  | 方括号（[   - ]） | 匹配指定的一个字符范围 | 用file_[a-z].txt，匹配file_a.txt、file_b.txt，直到file_z.txt |
+
+
+
+ 2.2.3 文件操作
+
+| 序号 | 命令                    | 作用                                                 |
+| :--- | :---------------------- | :--------------------------------------------------- |
+| 01   | cat 文件名              | 查看文件内容、创建文件、文件合并、追加文件内容等功能 |
+| 02   | head 文件名             | 显示文件头部                                         |
+| 03   | tail 文件名             | 显示文件尾部                                         |
+| 04   | grep 搜索文本 文件名    | 搜索文本文件内容                                     |
+| 05   | find  路径 -name 文件名 | 查找文件                                             |
+| 06   | wc  文件名              | 查看文件行数，单词数等信息                           |
+
+* 部分命令细节说明
+  * head，tail ： 选项-n，n表示一个数字，即可指定查看前n行或者后n行，不加选项默认查看10行。
+  * grep ： -n 用于显示行号，-i忽略大小写
+  * wc : -c 表示查看多少字符，-l查看多少行，-w 查看多少单词。如果不加选项则显示这三项。
+  * find：会从指定目录及其所有子目录中查询搜索文件。
+
+		
+
+ 2.2.4 压缩解压
+
+| 序号 | 命令          | 作用                                  |
+| :--- | :------------ | :------------------------------------ |
+| 01   | zip ，unzip   | 将文件压缩为zip格式/将zip格式文件解压 |
+| 02   | gzip，gunzip  | 将文件压缩为gz格式/将gz格式文件解压   |
+| 03   | bzip2,bunzip2 | 将文件压缩为bz2格式/将bz2格式文件解压 |
+| 04   | tar           | 对gz或者bz2格式进行压缩解压           |
+
+* 部分命令细节说明
+  * zip： 用于常与windows交互的情况，-r选项可以压缩目录
+  
+    * > zip    test.zip   filelist 
+  
+    * > unzip  test.zip
+  
+  * gzip，bzip2：不常用，因为压缩或者解压后源文件就不再了，而且只能对一个文件操作
+  
+  * tar：-cjf 用于压缩bz2格式文件，-czf用于压缩gz格式文件，-xvf用于解压文件,兼容了gzip和bzip2命令的功能。
+  
+    * > tar -czf   file.tar.gz   file1  file2 
+  
+    * > tar -xvf file.tar.gz
+
+		
+
+ 2.2.5 权限管理
+
+| 序号 | 命令  | 作用                                   |
+| :--- | :---- | :------------------------------------- |
+| 01   | sudo  | 放在一个命令前，表示使用管理员权限执行 |
+| 02   | chmod | 修改文件权限                           |
+
+
+* 部分命令细节说明
+  * sudo： 在打开终端第一次使用sudo时需要输入密码
+  
+  * `chmod` 在设置权限时，可以字母也可以使用三个数字分别对应 **拥有者** ／ **组** 和 **其他** 用户的权限
+  
+  ```bash
+  直接修改文件|目录的 读|写|执行 权限，但是不能精确到 拥有者|组|其他
+  chmod  augo+/-rwx 文件名/目录名
+  ```
+  
+  ![](./img/chmod.png)￼
+  
+  > 例如：
+  > `777` ===> `u=rwx,g=rwx,o=rwx`
+  > `755` ===> `u=rwx,g=rx,o=rx`
+  > `644` ===> `u=rw,g=r,o=r`
+
+
+
+ 2.2.6 显示展示命令
+| 序号 | 命令   | 作用                 |
+| :--- | :----- | :------------------- |
+| 01   | echo   | 向终端打印内容       |
+| 02   | date   | 显示当前时间         |
+| 03   | df     | 显示磁盘剩余空间     |
+| 04   | whoami | 显示当前用户         |
+| 05   | which  | 显示执行命令所在位置 |
+
+* 部分命令细节说明
+  * echo ： -n表示打印完成不换行
+  
+  * df:  -h选项以M为单位显示，-T显示文件系统类型 ext4的为磁盘
+  
+  * which：命令也是一个程序，实际就是显示程序所在位置
+  
+* 输出重定向
+
+  | 重定向符  | 含义                               | 实例                                                         |
+  | --------- | ---------------------------------- | ------------------------------------------------------------ |
+  | >   file  | 将file文件重定向为输出源，新建模式 | echo "hello world"   > out.txt，将执行结果，写到out.txt文件中，若有同名文件将被删除 |
+  | >>   file | 将file文件重定向为输出源，追加模式 | ls   /usr   >> Lsoutput.txt，将ls   /usr的执行结果，追加到Lsoutput.txt文件已有内容后 |
+
+* 管道
+
+管道可以把一系列命令连接起来，意味着第一个命令的输出将作为第二个命令的输入，通过管道传递给第二个命令，第二个命令的输出又将作为第三个命令的输入，以此类推。
+
+```shell
+	ls | grep 'test'
+```
+
+
+
+​	
+
+ 	2.2.7 其他命令
+
+| 序号 | 命令     | 作用         |
+| :--- | :------- | :----------- |
+| 01   | shutdown | 关机或者重启 |
+| 02   | ln       | 创建链接     |
+
+
+* 部分命令细节说明
+  * shutdown：
+  
+    * > shutdown -r now 立即重启
+  
+    * > shutdown now 立即关机
+  
+    * > shutdown +10 10分钟后关机
+  
+    * > shutdown -c  取消关机计划
+  
+  * ln : 一般使用  -s 选项 创建软链接，相当于快捷方式，如果跨目录创建要使用绝对路径。
+  
+    ```shell
+    ln -s  hello.py  hello
+    ```
+  
+    
+
+
+
+## 3. Linux服务器环境
+
+### 3.1 vi编译器
+
+ 3.1.1 什么是vi
+
+vi是Linux操作系统中一个自带的编辑器。没有图形界面，只能编译文本内容，没有字体段落等设置，通过命令强大的命令完成一系列的编写工作。
+
+ 3.1.2 学习目的
+
+1. 在实际工作中，要对 服务器上的文件进行 简单 的修改，使用 `vi` 进行快速的编辑即可。
+2. 对一些配置文件的修改，需要一定的权限，这时vi编辑器是最佳选择。
+3. vi 编辑器在 系统管理、服务器管理编辑文件时，其功能不是图形界面的编辑器能比拟的。
+
+ 3.1.3  操作使用
+
+* 打开和新建文件
+
+```bash
+$ vi 文件名
+
+如果文件已经存在，会直接打开该文件
+如果文件不存在，会新建一个文件
+```
+
+
+* 工作模式
+
+  1. **命令模式**
+     - **打开文件首先进入命令模式**，是使用 `vi` 的 **入口**
+     - 通过 **命令** 对文件进行常规的编辑操作，例如：**定位**、**翻页**、**复制**、**粘贴**、**删除**……
+     - 在其他图形编辑器下，通过 **快捷键** 或者 **鼠标** 实现的操作，都在 **命令模式** 下实现
+  2. **底行模式** —— 执行 **保存**、**退出** 等操作 
+     - 要退出 `vi` 返回到控制台，需要在末行模式下输入命令
+     - **末行模式** 是 `vi` 的 **出口**
+  3. **编辑模式** —— 正常的编辑文字
+
+![](./img/ms.png)
+
+* 进入编辑模式命令
+
+| 命令 |  英文  | 功能                   |  常用  |
+| :--: | :----: | ---------------------- | :----: |
+|  i   | insert | 在当前字符前插入文本   |  常用  |
+|  I   | insert | 在行首插入文本         | 较常用 |
+|  a   | append | 在当前字符后添加文本   |        |
+|  A   | append | 在行末添加文本         | 较常用 |
+|  o   |        | 在当前行后面插入一空行 |  常用  |
+|  O   |        | 在当前行前面插入一空行 |  常用  |
+
+
+* 底行模式常用命令
+
+| 命令 | 功能                           |
+| :--: | ------------------------------ |
+|  w   | 保存                           |
+|  q   | 退出，如果没有保存，不允许退出 |
+|  q!  | 强行退出，不保存退出           |
+|  wq  | 保存并退出                     |
+|  w!  | 强制保存                       |
+
+* 命令模式常用命令
+
+	* 1）行内移动
+	| 命令 | 功能                           |
+	| :--: | ------------------------------ |
+	|  w   | 向后移动一个单词               |
+	|  b   | 向前移动一个单词               |
+	|  0   | 行首                           |
+	|  ^   | 行首，第一个不是空白字符的位置 |
+	|  $   | 行尾                           |
+	
+	* 2） 行数移动
+	
+	| 命令  | 功能                 |
+	| :---: | -------------------- |
+	|  gg   | 文件顶部             |
+	|   G   | 文件末尾             |
+	| :数字 | 移动到 数字 对应行数 |
+
+
+
+* 撤销和恢复撤销
+
+
+|   命令   | 功能           |
+| :------: | -------------- |
+|    u     | 撤销上次命令   |
+| CTRL + r | 恢复撤销的命令 |
+
+* 删除文本
+
+| 命令 | 功能                                          |
+| :--: | --------------------------------------------- |
+|  x   | 删除光标所在字符，或者选中文字                |
+|  c   | 和移动命令连用,删除光标所在位置到指定位置内容 |
+
+```
+cw        # 从光标位置删除到单词末尾
+c0        # 从光标位置删除到一行的起始位置
+cb       # 从光标位置删除到单词开头
+```
+
+* 剪切、复制、粘贴
+
+| 命令 | 功能                              |
+| :--: | --------------------------------- |
+|  yy  | 复制一行，可以 nyy 复制多行       |
+|  dd  | 删除光标所在行，可以 ndd 复制多行 |
+|  p   | 粘贴                              |
+
+
+* 替换
+
+|       命令        | 功能                   | 工作模式 |
+| :---------------: | ---------------------- | -------- |
+|         r         | 替换当前字符           | 命令模式 |
+|         R         | 替换当前行光标后的字符 | 替换模式 |
+| :%s/str/replace/g | 替换str为replace       | 底行模式 |
+
+> `R` 命令可以进入 **替换模式**，替换完成后，按下 `ESC` 可以回到 **命令模式**
+
+
+
+* 查找
+
+|  命令   | 功能     |
+| :-----: | -------- |
+|  /str   | 查找 str |
+| :set nu | 显示行号 |
+
+> 查找到指定内容之后，使用 `n` 查找下一个出现的位置
+
+
+
+
+
+![](img/vi.png)
+
+
+
+
+
+### 3.2 添加用户
+
+
+
+ 3.2.1 基本概念
+
+* 用户：Linux操作系统可以有不同的用户，这是系统管理的重要一环，不同的用户有自己独立的空间内容。
+
+* 用户组：为了方便对用户管理，Linux操作系统使用用户组的概念。将不同的用户添加到对应的组中，可以方便用户设置权限的设置。
+
+* root用户：Linux系统中的root用户通常用于系统的维护和管理，对操作系统的所有资源具有所有访问权限，一般工作中不会使用root用户进行系统操作，防止一些误操作带来系统损坏。
+
+  
+
+ 3.2.2  用户管理命令
+
+| 序号 | 命令                    | 作用         |
+| :--: | ----------------------- | ------------ |
+|  01  | groupadd  组名          | 添加组       |
+|  02  | groupdel 组名           | 删除组       |
+|  03  | useradd -m 用户  -g  组 | 添加用户     |
+|  04  | passwd  用户名          | 设置用户密码 |
+|  05  | userdel -r 用户         | 删除用户     |
+
+
+* useradd : -m 表示添加用户时添加主目录，-g表示选择用户所在组，如果不写默认会创建一个与用户同名的组。
+
+  ```shell
+  useradd -m levi
+  ```
+
+* passwd ： 设置密码，设置之后才能切换新用户登录
+
+* 设置密码后为新用户添加sudo权限,打开sudoers文件增加如下内容，然后 :w! 强制保存 :q 退出
+
+  ```
+  sudo vi /etc/sudoers
+  ```
+
+  ![](./img/sudo.png)
+
+  ```
+  passwd levi
+  注意：1. 新创建的用户和密码信息存储在 /etc/passwd文件中
+       2. 如果切换用户终端命令行只有一个$ 提示，则vi打开这个文件，将该用户对应的内容修改
+  ```
+
+  ![](./img/user.png)
+
+* userdel:  一般使用-r 彻底删除，如果删除失败说明刚刚使用了改用户，需要重启再删除。或者执行下面命令。
+
+  ![](./img/deluser.png)
+
+
+
+
+
+### 3.3 软件安装
+
+Linux下安装的软件包是 deb格式软件包。由于当时Linux系统中软件包存在复杂的依赖关系。因而，通常使用网络安装。
+
+| 作用                 | 命令                  |
+| -------------------- | --------------------- |
+| 升级软件包           | apt   update          |
+| 安装软件             | apt   install         |
+| 卸载软件             | apt   remove  --purge |
+| 删除缓存的软件安装包 | apt   clean           |
+
+
+
+* 注意事项 ： 安装软件包通常需要使用管理员权限。
+* 软件包下载位置：/var/cache/apt/archives
+
+```
+sudo apt install sl   # 安装
+sudo apt remove --purge  sl  # 彻底卸载
+```
+
+
+
+
+
+### 3.4 ssh服务
+
+ssh是一种安全协议，主要用于给远程登录会话数据进行加密，保证数据传输的安全。在数据传输方面有很多应用。之前说到，实际工作中经常需要远程访问服务器，ssh就是通用的远程访问服务器的方法。
+
+
+
+* 安装启动
+
+  - 安装ssh服务 ： sudo apt install openssh-server
+
+  - 查看ssh服务状态 ： ps -e|grep ssh
+
+    ![](./img/ssh1.png)
+
+  - 启动和关闭 ：
+    
+    > sudo service ssh start/restart/stop
+
+* 常用命令
+
+
+| 序号 | 命令                                              | 作用         |
+| :--- | :------------------------------------------------ | :----------- |
+| 01   | ssh 用户名@ip                                     | 登录远程主机 |
+| 02   | scp 用户名@ip:文件名或路径 用户名@ip:文件名或路径 | 远程复制文件 |
+
+
+
+1. ssh登录
+
+   ```shell
+   ssh  levi@192.168.100.5    # 登录
+   exit                      # 退出
+   ```
+
+   
+
+![](./img/ssh2.png)
+
+2. scp拷贝
+
+   ```shell
+   
+   # 注意：`:` 后面的路径写绝对路径
+   scp  demo.py levi@192.168.100.5:/home/tarena
+   
+   # 把远程主目录下demo.py文件 复制到本地当前目录下
+   scp  levi@192.168.100.5:/home/tarena/demo.py  .
+   
+   # 加上 -r 选项可以传送文件夹
+   scp -r demo levi@192.168.100.5:/home/tarena/
+   
+   ```
+
+
+
+* ssh秘钥
+
+  * 什么时候使用： 如果使用的客户端个人计算机是自己独有的计算机，经常通过ssh访问服务器，此时不想频繁输入密码，则可以使用秘钥处理。
+
+    ![ssh](img/ssh.png)
+
+  * 使用方法
+
+    ```
+    1. 在个人计算机中生产秘钥对 ： ssh-keygen  执行以后会在主目录下生成一个.ssh文件夹,其中包含私钥文件id_rsa和公钥文件id_rsa.pub。
+    2. 在服务器主机上创建文件~/.ssh/authorized_keys，将信任的计算机的id_rsa.pub文件内容追加到服务器authorized_keys文件中，并修改其权限为777。
+    ```
+
+    
+
+### 3.5 终端启动Python服务
+
+
+
+在服务器中并没有pycharm这些集成编译工具，所有当我们最后将程序部署在服务器上执行时，往往需要通过终端运行python程序。
+
+1. 编写python程序在第一行增加解释器声明
+
+![](./img/linux1.png)
+
+2. 修改文件的执行权限
+
+![](./img/linux2.png)
+
+3. 执行代码
+
+![](./img/linux3.png)
+
+   
+
+**王伟超**
+
+**wangweichao@tedu.cn**
+
+# **SPIDER-DAY01**
+
+|             |                                                              |
+| ----------- | ------------------------------------------------------------ |
+| 写入数据库  | ins = 'insert into novel_tab values(%s,%s,%s,%s)'<br />db.cursor().**execute**(ins,**list**) |
+| 写入csv操作 | with open('fengyun.csv', 'w', newline='') as f:<br />writer = csv.writer(f)<br />writer.**writerow**(['聂风','雪饮狂刀']) |
+|             |                                                              |
+|             |                                                              |
+|             |                                                              |
+|             |                                                              |
+|             |                                                              |
+|             |                                                              |
+|             |                                                              |
+|             |                                                              |
+|             |                                                              |
+|             |                                                              |
+|             |                                                              |
+|             |                                                              |
+
+## **1. 网络爬虫概述**
+
+```python
+【1】定义
+    1.1) 网络蜘蛛、网络机器人，抓取网络数据的程序
+    1.2) 其实就是用Python程序模仿人点击浏览器并访问网站，而且模仿的越逼真越好
+
+【2】爬取数据的目的
+    2.1) 公司项目的测试数据，公司业务所需数据
+    2.2) 获取大量数据，用来做数据分析
+
+【3】企业获取数据方式
+    3.1) 公司自有数据
+    3.2) 第三方数据平台购买(数据堂、贵阳大数据交易所)
+    3.3) 爬虫爬取数据
+
+【4】Python做爬虫优势
+    4.1) Python ：请求模块、解析模块丰富成熟,强大的Scrapy网络爬虫框架
+    4.2) PHP ：对多线程、异步支持不太好
+    4.3) JAVA：代码笨重,代码量大
+    4.4) C/C++：虽然效率高,但是代码成型慢
+
+【5】爬虫分类
+    5.1) 通用网络爬虫(搜索引擎使用,遵守robots协议)
+        robots协议: 网站通过robots协议告诉搜索引擎哪些页面可以抓取,哪些页面不能抓取，通用网络爬虫需要遵守robots协议（君子协议）
+	    示例: https://www.baidu.com/robots.txt
+    5.2) 聚焦网络爬虫 ：自己写的爬虫程序
+
+【6】爬取数据步骤
+    6.1) 确定需要爬取的URL地址
+    6.2) 由请求模块向URL地址发出请求,并得到网站的响应
+    6.3) 从响应内容中提取所需数据
+       a> 所需数据,保存
+       b> 页面中有其他需要继续跟进的URL地址,继续第2步去发请求，如此循环
+```
+
+## **==2. 爬虫请求模块==**
+
+### **2.1 requests模块**
+
+- **安装**
+
+  ```python
+  【1】Linux
+      sudo pip3 install requests
+  
+  【2】Windows
+      方法1>  cmd命令行 -> python -m pip install requests
+      方法2>  右键管理员进入cmd命令行 ：pip install requests
+  ```
+
+### **2.2 常用方法**
+
+- **requests.get()**
+
+  ```python
+  【1】作用
+      向目标网站发起请求,并获取响应对象
+  
+  【2】参数
+      2.1> url ：需要抓取的URL地址
+      2.2> headers : 请求头
+      2.3> timeout : 超时时间，超过时间会抛出异常
+  ```
+
+- **此生第一个爬虫**
+
+  ```python
+  """
+  向京东官网（https://www.jd.com/）发请求,获取响应内容
+  """
+  import requests
+  
+  resp = requests.get(url='https://www.jd.com/')
+  # 1.text属性: 获取响应内容-字符串
+  html = resp.text
+  print(html)
+  ```
+
+- **响应对象（res）属性**
+
+  ```python
+  【1】text        ：字符串
+  【2】content     ：字节流
+  【3】status_code ：HTTP响应码
+  【4】url         ：实际数据的URL地址
+  ```
+
+-   **重大问题思考**
+
+  ==网站如何来判定是人类正常访问还是爬虫程序访问？--检查请求头！！！== 
+
+  ```python
+  # 请求头（headers）中的 User-Agent
+  # 测试案例: 向测试网站http://httpbin.org/get发请求，查看请求头(User-Agent)
+  import requests
+  
+  url = 'http://httpbin.org/get'
+  res = requests.get(url=url)
+  html = res.text
+  print(html)
+  # 请求头中:User-Agent为-> python-requests/2.22.0 那第一个被网站干掉的是谁？？？我们是不是需要发送请求时重构一下User-Agent？？？添加 headers 参数！！！
+  ```
+
+
+- **重大问题解决 - headers参数**
+
+  ```python
+  """
+  包装好请求头后,向测试网站发请求,并验证
+  养成好习惯，发送请求携带请求头，重构User-Agent
+  """
+  import requests
+  
+  url = 'http://httpbin.org/get'
+  headers = {'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/14.0.835.163 Safari/535.1'}
+  html = requests.get(url=url,headers=headers).text
+  # 在html中确认User-Agent
+  print(html)
+  ```
+
+## **3. 爬虫编码模块**
+
+- **urllib.parse模块**
+
+  ```python
+  1、标准库模块：urllib.parse
+  2、导入方式：
+  import urllib.parse
+  from urllib import parse
+  ```
+  
+- **作用**
+
+  ```python
+  给URL地址中查询参数进行编码
+      
+  # 示例
+  编码前：https://www.baidu.com/s?wd=美女
+  编码后：https://www.baidu.com/s?wd=%E7%BE%8E%E5%A5%B3
+  ```
+
+
+### **3.1 urlencode()**
+
+- **作用**
+
+  ```python
+  给URL地址中查询参数进行编码，参数类型为字典
+  ```
+
+- **使用方法**
+
+  ```python
+  # 1、URL地址中 一 个查询参数
+  编码前: params = {'wd':'美女'}
+  编码中: params = urllib.parse.urlencode(params)
+  编码后: params结果:  'wd=%E7%BE%8E%E5%A5%B3'
+      
+  # 2、URL地址中 多 个查询参数
+  编码前: params = {'wd':'美女','pn':'50'}
+  编码中: params = urllib.parse.urlencode(params)
+  编码后: params结果: 'wd=%E7%BE%8E%E5%A5%B3&pn=50'
+  发现编码后会自动对多个查询参数间添加 & 符号
+  ```
+
+- **拼接URL地址的三种方式**
+
+  ```python
+  # url = 'http://www.baidu.com/s?'
+  # params = {'wd':'赵丽颖'}
+  # 问题: 请拼接出完整的URL地址
+  **********************************
+  params = urllib.parse.urlencode(params)
+  【1】字符串相加
+  【2】字符串格式化（占位符 %s）
+  【3】format()方法
+      'http://www.baidu.com/s?{}'.format(params)
+      
+  【练习】
+      进入瓜子二手车直卖网官网 - 我要买车 - 请使用3种方法拼接前20页的URL地址,从终端打印输出
+      官网地址：https://www.guazi.com/langfang/
+          
+  url = 'https://www.guazi.com/bj/buy/o{}/#bread'
+  for o in range(1, 21):
+      page_url = url.format(o)
+      print(page_url)
+  ```
+
+- **练习**
+
+  ```python
+  """
+  问题: 在百度中输入要搜索的内容，把响应内容保存到本地文件
+  编码方法使用 urlencode()
+  """
+  import requests
+  from urllib import parse
+  
+  # 1. 拼接URL地址
+  word = input('请输入搜索关键字:')
+  params = parse.urlencode({'wd':word})
+  url = 'http://www.baidu.com/s?{}'.format(params)
+  
+  # 2. 发请求获取响应内容
+  headers = {'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/14.0.835.163 Safari/535.1'}
+  html = requests.get(url=url, headers=headers).text
+  
+  # 3. 保存到本地文件
+  filename = '{}.html'.format(word)
+  with open(filename, 'w', encoding='utf-8') as f:
+      f.write(html)
+  ```
+
+### **3.2 quote()**
+
+- **使用方法**
+
+  ```python
+  http://www.baidu.com/s?wd=赵丽颖
+      
+  # 对单独的字符串进行编码 - URL地址中的中文字符
+  word = '美女'
+  result = urllib.parse.quote(word)
+  result结果: '%E7%BE%8E%E5%A5%B3'
+  ```
+
+- **练习**
+
+  ```python
+  """
+  问题: 在百度中输入要搜索的内容，把响应内容保存到本地文件
+  编码方法使用 quote()
+  """
+  import requests
+  from urllib import parse
+  
+  # 1. 拼接URL地址
+  word = input('请输入搜索关键字:')
+  params = parse.quote(word)
+  url = 'http://www.baidu.com/s?wd={}'.format(params)
+  
+  # 2. 发请求获取响应内容
+  headers = {'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/14.0.835.163 Safari/535.1'}
+  html = requests.get(url=url, headers=headers).content.decode('utf-8')
+  
+  # 3. 保存到本地文件
+  filename = '{}.html'.format(word)
+  with open(filename, 'w', encoding='utf-8') as f:
+      f.write(html)
+  ```
+
+### **3.3 unquote()**
+
+```python
+# 将编码后的字符串转为普通的Unicode字符串
+from urllib import parse
+
+params = '%E7%BE%8E%E5%A5%B3'
+result = parse.unquote(params)
+
+result结果: 美女
+```
+
+## **4. 百度贴吧爬虫**
+
+### **4.1 需求**
+
+```python
+1、输入贴吧名称: 赵丽颖吧
+2、输入起始页: 1
+3、输入终止页: 2
+4、保存到本地文件：赵丽颖吧_第1页.html、赵丽颖吧_第2页.html
+```
+
+### **4.2 实现步骤**
+
+```python
+【1】查看所抓数据在响应内容中是否存在
+    右键 - 查看网页源码 - 搜索关键字
+
+【2】查找并分析URL地址规律
+    第1页: http://tieba.baidu.com/f?kw=???&pn=0
+    第2页: http://tieba.baidu.com/f?kw=???&pn=50
+    第n页: pn=(n-1)*50
+
+【3】发请求获取响应内容
+
+【4】保存到本地文件
+```
+
+### **4.3 代码实现**
+
+```python
+"""
+    1、输入贴吧名称: 赵丽颖吧
+    2、输入起始页: 1
+    3、输入终止页: 2
+    4、保存到本地文件：赵丽颖吧_第1页.html、赵丽颖吧_第2页.html
+"""
+import requests
+from urllib import parse
+import time
+import random
+
+class TiebaSpider:
+    def __init__(self):
+        """定义常用变量"""
+        self.url = 'http://tieba.baidu.com/f?kw={}&pn={}'
+        self.headers = {'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/14.0.835.163 Safari/535.1'}
+
+    def get_html(self, url):
+        """请求功能函数"""
+        html = requests.get(url=url, headers=self.headers).content.decode('utf-8')
+
+        return html
+
+    def parse_html(self):
+        """解析功能函数"""
+        pass
+
+    def save_html(self, filename, html):
+        """数据处理函数"""
+        with open(filename, 'w') as f:
+            f.write(html)
+
+    def run(self):
+        """程序入口函数"""
+        name = input('请输入贴吧名:')
+        start = int(input('请输入起始页:'))
+        end = int(input('请输入终止页:'))
+        # 编码
+        params = parse.quote(name)
+        # 拼接多页的URL地址
+        for page in range(start, end + 1):
+            pn = (page - 1) * 50
+            page_url = self.url.format(params, pn)
+            # 请求 + 解析 + 数据处理
+            html = self.get_html(url=page_url)
+            filename = '{}_第{}页.html'.format(name, page)
+            self.save_html(filename, html)
+            # 终端提示
+            print('第%d页抓取完成' % page)
+            # 控制数据抓取的频率
+            time.sleep(random.randint(1, 2))
+
+if __name__ == '__main__':
+    spider = TiebaSpider()
+    spider.run()
+```
+
+## **5. 正则解析模块re**
+
+### **5.1 使用流程**
+
+```python
+r_list=re.findall('正则表达式',html,re.S)
+```
+
+### **5.2 元字符**
+
+| 元字符 | 含义                     |
+| ------ | ------------------------ |
+| .      | 任意一个字符（不包括\n） |
+| \d     | 一个数字                 |
+| \s     | 空白字符                 |
+| \S     | 非空白字符               |
+| []     | 包含[]内容               |
+| *      | 出现0次或多次            |
+| +      | 出现1次或多次            |
+
+- **思考 - 匹配任意一个字符的正则表达式？**
+
+  ```python
+  r_list = re.findall('.', html, re.S)
+  ```
+
+### **5.3 贪婪与非贪婪**
+
+- **贪婪匹配(默认)**
+
+  ```python
+  1、在整个表达式匹配成功的前提下,尽可能多的匹配 * + ?
+  2、表示方式：.* .+ .?
+  ```
+
+- **非贪婪匹配**
+
+  ```python
+  1、在整个表达式匹配成功的前提下,尽可能少的匹配 * + ?
+  2、表示方式：.*? .+? .??
+  ```
+
+- **代码示例**
+
+  ```python
+  import re
+  
+  html = '''
+  <div><p>九霄龙吟惊天变</p></div>
+  <div><p>风云际会潜水游</p></div>
+  '''
+  # 贪婪匹配
+  p = re.compile('<div><p>.*</p></div>',re.S)
+  r_list = p.findall(html)
+  print(r_list)
+  
+  # 非贪婪匹配
+  p = re.compile('<div><p>.*?</p></div>',re.S)
+  r_list = p.findall(html)
+  print(r_list)
+  ```
+
+### **5.4 正则分组**
+
+- **作用**
+
+  ```python
+  在完整的模式中定义子模式，将每个圆括号中子模式匹配出来的结果提取出来
+  ```
+
+- **示例代码**
+
+  ```python
+  import re
+  
+  s = 'A B C D'
+  p1 = re.compile('\w+\s+\w+')
+  print(p1.findall(s))
+  # 分析结果是什么？？？
+  # 结果: ['A B', 'C D']
+  
+  p2 = re.compile('(\w+)\s+\w+')
+  print(p2.findall(s))
+  # 第一步: ['A B', 'C D']
+  # 第二步: ['A', 'C']
+  
+  p3 = re.compile('(\w+)\s+(\w+)')
+  print(p3.findall(s))
+  # 第一步: ['A B', 'C D']
+  # 第二步: [('A','B'),('C','D')]
+  ```
+  
+- **分组总结**
+
+  ```python
+  1、在网页中,想要什么内容,就加()
+  2、先按整体正则匹配,然后再提取分组()中的内容
+     如果有2个及以上分组(),则结果中以元组形式显示 [(),(),()]
+  3、最终结果有3种情况
+     情况1：[]
+     情况2：['', '', '']  -- 正则中1个分组时
+     情况3：[(), (), ()]  -- 正则中多个分组时
+  ```
+
+- **课堂练习**
+
+  ```python
+  # 从如下html代码结构中完成如下内容信息的提取：
+  问题1 ：
+      [('Tiger',' Two...'),('Rabbit','Small..')]
+  问题2 ：
+  	动物名称 ：Tiger
+  	动物描述 ：Two tigers two tigers run fast
+      **********************************************
+  	动物名称 ：Rabbit
+  	动物描述 ：Small white rabbit white and white
+  ```
+
+- **页面结构如下**
+
+  ```python
+  <div class="animal">
+      <p class="name">
+  			<a title="Tiger"></a>
+      </p>
+      <p class="content">
+  			Two tigers two tigers run fast
+      </p>
+  </div>
+  
+  <div class="animal">
+      <p class="name">
+  			<a title="Rabbit"></a>
+      </p>
+  
+      <p class="content">
+  			Small white rabbit white and white
+      </p>
+  </div>
+  ```
+
+- **练习答案**
+
+  ```python
+  import re
+  
+  html = '''<div class="animal">
+      <p class="name">
+          <a title="Tiger"></a>
+      </p>
+  
+      <p class="content">
+          Two tigers two tigers run fast
+      </p>
+  </div>
+  
+  <div class="animal">
+      <p class="name">
+          <a title="Rabbit"></a>
+      </p>
+  
+      <p class="content">
+          Small white rabbit white and white
+      </p>
+  </div>'''
+  
+  p = re.compile('<div class="animal">.*?title="(.*?)".*?content">(.*?)</p>.*?</div>',re.S)
+  r_list = p.findall(html)
+  
+  for rt in r_list:
+      print('动物名称:',rt[0].strip())
+      print('动物描述:',rt[1].strip())
+      print('*' * 50)
+  ```
+
+## **6. 笔趣阁小说爬虫**
+
+### **6.1 项目需求**
+
+```python
+【1】官网地址：https://www.biqukan.cc/list/
+	选择一个类别，比如：'玄幻小说'
+    
+【2】爬取目标
+	'玄幻小说'类别下前20页的
+	2.1》小说名称
+	2.2》小说链接
+	2.3》小说作者
+	2.4》小说描述
+```
+
+### **6.2 思路流程**
+
+```python
+【1】查看网页源码，确认数据来源
+	响应内容中存在所需抓取数据
+
+【2】翻页寻找URL地址规律
+    第1页：https://www.biqukan.cc/fenlei1/1.html
+    第2页：https://www.biqukan.cc/fenlei1/2.html
+    第n页：https://www.biqukan.cc/fenlei1/n.html
+
+【3】编写正则表达式
+    '<div class="caption">.*?<a href="(.*?)" title="(.*?)">.*?<small.*?>(.*?)</small>.*?>(.*?)</p>'
+    
+【4】开干吧兄弟
+
+【5】排错思路
+	5.1》print(novel_list) 确认是否为空列表
+    5.2》空列表: print(html) 确认响应内容是否正确
+    5.3》响应内容正确,检查正则表达式！！！
+```
+
+### **6.3 代码实现**
+
+```python
+"""
+目标:
+    笔趣阁玄幻小说数据抓取
+思路:
+    1. 确认数据来源 - 右键 查看网页源代码,搜索关键字
+    2. 确认静态,观察URL地址规律
+    3. 写正则表达式
+    4. 写代码
+"""
+
+import re
+import requests
+import time
+import random
+
+class NovelSpider:
+    def __init__(self):
+        self.url = 'https://www.biqukan.cc/fenlei1/{}.html'
+        self.headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.193 Safari/537.36'}
+
+    def get_html(self, url):
+        html = requests.get(url=url, headers=self.headers).content.decode('gbk', 'ignore')
+
+        self.refunc(html)
+
+    def refunc(self, html):
+        """正则解析函数"""
+        regex = '<div class="caption">.*?<a href="(.*?)" title="(.*?)">.*?<small.*?>(.*?)</small>.*?>(.*?)</p>'
+        novel_info_list = re.findall(regex, html, re.S)
+        for one_novel_info_tuple in novel_info_list:
+            item = {}
+            item['title'] = one_novel_info_tuple[1].strip()
+            item['href'] = one_novel_info_tuple[0].strip()
+            item['author'] = one_novel_info_tuple[2].strip()
+            item['comment'] = one_novel_info_tuple[3].strip()
+            print(item)
+
+    def crawl(self):
+        for page in range(1, 6):
+            page_url = self.url.format(page)
+            self.get_html(url=page_url)
+            time.sleep(random.randint(1, 2))
+
+if __name__ == '__main__':
+    spider = NovelSpider()
+    spider.crawl()
+```
+
+## **7. MySQL数据持久化**
+
+### **7.1 pymysql回顾**
+
+- **MySQL建库建表**
+
+  ```mysql
+  create database noveldb charset utf8;
+  use noveldb;
+  create table novel_tab(
+  title varchar(100),
+  href varchar(500),
+  author varchar(100),
+  comment varchar(500)
+  )charset=utf8;
+  ```
+
+- **pymysql示例**
+
+  ```python
+  import pymysql
+  
+  db = pymysql.connect('localhost','root','123456','noveldb',charset='utf8')
+  cursor = db.cursor()
+  
+  ins = 'insert into novel_tab values(%s,%s,%s,%s)'
+  novel_li = ['花千骨', 'http://zly.com', '赵丽颖', '小骨的传奇一生']
+  cursor.execute(ins,novel_li)
+  
+  db.commit()
+  cursor.close()
+  db.close()
+  ```
+
+### **7.2 笔趣阁数据持久化**
+
+```mysql
+"""
+1. 在 __init__() 中连接数据库并创建游标对象
+2. 在数据处理函数中将所抓取的数据处理成列表，使用execute()方法写入数据库
+3. 数据抓取完成后关闭游标及断开数据库连接
+"""
+import re
+import requests
+import time
+import random
+import pymysql
+
+class NovelSpider:
+    def __init__(self):
+        self.url = 'https://www.biqukan.cc/fenlei1/{}.html'
+        self.headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.193 Safari/537.36'}
+        # 连接数据库
+        self.db = pymysql.connect('localhost', 'root', '123456', 'noveldb', charset='utf8')
+        self.cur = self.db.cursor()
+
+    def get_html(self, url):
+        html = requests.get(url=url, headers=self.headers).content.decode('gbk', 'ignore')
+
+        self.refunc(html)
+
+    def refunc(self, html):
+        """正则解析函数"""
+        regex = '<div class="caption">.*?<a href="(.*?)" title="(.*?)">.*?<small.*?>(.*?)</small>.*?>(.*?)</p>'
+        novel_info_list = re.findall(regex, html, re.S)
+        for one_novel_info in novel_info_list:
+            # 调用数据处理函数
+            self.save_to_mysql(one_novel_info)
+
+    def save_to_mysql(self, one_novel_info):
+        """将数据存入MySQL数据库"""
+        one_novel_li = [
+            one_novel_info[1].strip(),
+            one_novel_info[0].strip(),
+            one_novel_info[2].strip(),
+            one_novel_info[3].strip(),
+        ]
+        ins = 'insert into novel_tab values(%s,%s,%s,%s)'
+        self.cur.execute(ins, one_novel_li)
+        self.db.commit()
+        # 终端打印测试
+        print(one_novel_li)
+
+    def crawl(self):
+        for page in range(1, 6):
+            page_url = self.url.format(page)
+            self.get_html(url=page_url)
+            time.sleep(random.randint(1, 2))
+
+        # 所有数据抓取完成后断开数据库连接
+        self.cur.close()
+        self.db.close()
+
+if __name__ == '__main__':
+    spider = NovelSpider()
+    spider.crawl()
+```
+
+## **8. 今日作业**
+
+
+
+```python
+【1】把百度贴吧案例重写一遍,不要参照课上代码
+【2】笔趣阁案例重写一遍,不要参照课上代码
+【3】复习任务
+	pymysql、MySQL基本命令
+	MySQL　：建库建表普通查询、插入、删除等
+	Redis ： python和redis交互,集合基本操作
+【4】猫眼电影top100数据抓取
+	https://maoyan.com/board/4
+    共10页,抓取 电影名称、主演、上映时间
+    数据存入MySQL数据库
+```
+
+
+
+
+
+
+
+​     
