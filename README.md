@@ -32,6 +32,8 @@
 | 调用函数 | dataframe.col.apply( ) |
 |      表格形状      |              dataframe.**shape**              |
 |     返回非空值的series     | pandas.**notnull**(dataframe.col) |
+|     返回空值的布尔矩阵     | pandas.**isnull**(dataframe) |
+|     选择元素数据类型     | data.**select_dtypes**(include=["object"]) |
 | 列出列表中不同值 | dataframe.col.**unique( )** |
 | 调用函数 | dataframe.col.**apply**(lambda x: x.split(",")) |
 | 分组函数 | dataframe.**groupby**(col) |
@@ -49,6 +51,9 @@
 | 删除所有缺失值 | data.col.**dropna()** |
 | 快速合并 | data.**join**(data2) |
 | 合并两个表 | pd.**concat**([data1,data2]) |
+| 除去制定符号 | data.col.str.**restrip**("%") |
+| 改变数据类型 | data.col.str.**astype**("float") |
+|  |  |
 
 特征相关性，返回上三角矩阵
 
@@ -206,17 +211,17 @@ def plot_confusion_matrix(cm, classes,
 
 ## sklearn
 
-|              |                                                              |
-| :----------- | :----------------------------------------------------------- |
-| 标准化       | standardscaler( ).fit_transform(dataframe[col])              |
-| 计算距离     | from scipy.spatial import distance<br/>distance.euclidean(list1,list2) |
-| 交叉验证     | from sklearn.model_selection import KFold<br />KFold = **KFold**(len,n_splits=5,shuffle=True)<br />for train_index,test_index in **KFold.split**(datafram):<br />返回表格索引值index,type=ndarray |
-| 随机森林分类 | from sklearn.ensemble import RandomForestClassifier<br />**RandomForestClassifier**(n_estimators=n,max_depth=m) |
-| 划分数据集   | **train_test_split**(x,y,test_size=0.3)                      |
-| 召回率       | from sklearn.metrics import confusion_matrix,recall_score<br />**recall_socre**(yfact,ypred) |
-| Lasso回归    | lasso = **Lasso**(random_state = seed，alpha = a)<br />lasso.**fit**(X_train, y_train)<br />scores[= lasso.**score**(X_test, y_test) |
-| Lassocv回归  | lassocv = **LassoCV**(cv = 10, random_state = seed)<br />lassocv.**fit**(features, target)<br />lassocv_score = lassocv.**score**(features, target)<br />lassocv_alpha = lassocv.**alpha_** |
-|              |                                                              |
+|                                  |                                                              |
+| :------------------------------- | :----------------------------------------------------------- |
+| 标准化                           | standardscaler( ).fit_transform(dataframe[col])              |
+| 计算距离                         | from scipy.spatial import distance<br/>distance.euclidean(list1,list2) |
+| 交叉验证                         | from sklearn.model_selection import KFold<br />KFold = **KFold**(len,n_splits=5,shuffle=True)<br />for train_index,test_index in **KFold.split**(datafram):<br />返回表格索引值index,type=ndarray |
+| 随机森林分类                     | from sklearn.ensemble import RandomForestClassifier<br />**RandomForestClassifier**(n_estimators=n,max_depth=m) |
+| 划分数据集                       | **train_test_split**(x,y,test_size=0.3)                      |
+| 召回率                           | from sklearn.metrics import confusion_matrix,recall_score<br />**recall_socre**(yfact,ypred) |
+| Lasso回归                        | lasso = **Lasso**(random_state = seed，alpha = a)<br />lasso.**fit**(X_train, y_train)<br />scores[= lasso.**score**(X_test, y_test) |
+| Lassocv回归                      | lassocv = **LassoCV**(cv = 10, random_state = seed)<br />lassocv.**fit**(features, target)<br />lassocv_score = lassocv.**score**(features, target)<br />lassocv_alpha = lassocv.**alpha_** |
+| 交叉验证结果<br />交叉验证得分值 | from sklearn.model_selection import cross_val_predict, cross_val_score<br />predictions = **cross_val_predict**(lr, features, target, cv=kf) |
 
 
 
@@ -8710,22 +8715,11 @@ if __name__ == '__main__':
     spider.crawl()
 ```
 
-## **8. 今日作业**
 
 
 
-```python
-【1】把百度贴吧案例重写一遍,不要参照课上代码
-【2】笔趣阁案例重写一遍,不要参照课上代码
-【3】复习任务
-	pymysql、MySQL基本命令
-	MySQL　：建库建表普通查询、插入、删除等
-	Redis ： python和redis交互,集合基本操作
-【4】猫眼电影top100数据抓取
-	https://maoyan.com/board/4
-    共10页,抓取 电影名称、主演、上映时间
-    数据存入MySQL数据库
-```
+
+
 
 
 
